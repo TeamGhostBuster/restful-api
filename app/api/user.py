@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask.ext.restplus import Resource
 
 class User(Resource):
     def get(self):

@@ -1,4 +1,4 @@
-from flask_restplus import Resource, Api
+from flask.ext.restplus import Resource, Api
 
 #@api.route('/auth')
 class Auth(Resource):
