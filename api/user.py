@@ -1,6 +1,5 @@
-from flask_restplus import Resource, Api
+from flask.ext.restplus import Resource, Api
 
-#@api.route('/user')
 class User(Resource):
     def get(self):
         pass
