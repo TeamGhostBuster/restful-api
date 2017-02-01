@@ -1,0 +1,1 @@
+define({  "name": "Lithium API Documentation",  "version": "0.1.0",  "description": "Documentation",  "title": "Lithium API",  "sampleUrl": false,  "defaultVersion": "0.0.0",  "apidoc": "0.3.0",  "generator": {    "name": "apidoc",    "time": "2017-02-01T19:26:51.282Z",    "url": "http://apidocjs.com",    "version": "0.17.4"  }});
