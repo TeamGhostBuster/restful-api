@@ -6,6 +6,6 @@ CONFIG_MAP = {
 
 app = Flask(__name__)
 app.config.from_object(CONFIG_MAP['dev'])
-
+app.secret_key='xxxxx'
 
 from app import api
