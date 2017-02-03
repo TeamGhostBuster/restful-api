@@ -9,10 +9,10 @@ oauth = OAuth(app)
 
 google = oauth.remote_app(
     'google',
-    consumer_key=app.config.get('CLIENT_ID'),
-    consumer_secret=app.config.get('CLIENT_SECRET'),
+    consumer_key=app.config.get('CONFIG')['google']['client_key'],
+    consumer_secret=app.config.get('CONFIG')['google']['client_secret'],
     request_token_params={
-        'scope': 'email'
+        'scope': {'email', 'profile'}
     },
     base_url='https://www.googleapis.com/oauth2/v1/',
     request_token_url=None,
@@ -48,8 +48,15 @@ def logout():
     return redirect(url_for('index'))
 
 
+# TODO
 @app.route('/auth/<provider_name>/authorized')
 def authorized(provider_name):
+    """
+    Redirect back to the client's site
+
+    :param provider_name:
+    :return:
+    """
     resp = google.authorized_response()
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
@@ -64,3 +71,4 @@ def authorized(provider_name):
 @google.tokengetter
 def get_google_oauth_token():
     return session.get('google_token')
+
