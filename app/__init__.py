@@ -1,11 +1,24 @@
+import os
 from flask import Flask
+from flask_mongoengine import MongoEngine
 
-CONFIG_MAP = {
-    'dev': 'config.DevConfig'
+
+config = {
+    'prod': 'app.config.ProductionConfig',
+    'deploy': 'app.config.DeployConfig',
+    'dev': 'app.config.DevelopmentConfig'
 }
 
+# initialize flask instance
 app = Flask(__name__)
-app.config.from_object(CONFIG_MAP['dev'])
-app.secret_key='xxxxx'
 
+# initialize MongoEngine instance
+db = MongoEngine()
+db.init_app(app)
+
+# read environment variable from the system
+config_name = os.getenv('FLASK_CONFIGURATION')
+app.config.from_object(config[config_name])
+
+# import api module
 from app import api
