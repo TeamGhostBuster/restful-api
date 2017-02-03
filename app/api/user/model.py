@@ -1,3 +1,8 @@
-class User:
-    def __init__(self):
-        pass
+from mongoengine import *
+from app import db
+
+
+class User(db.Document):
+    id = ObjectIdField(required=True)
+    email = EmailField(required=True)
+    token = StringField()
