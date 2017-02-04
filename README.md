@@ -13,3 +13,12 @@
 2. Edit the hosts file in order to test OAuth2 login on the local machine.
 
   `127.0.0.1 api.vfree.org localhost`
+  
+## Tools
+Build documentation with APIDOC
+
+`$ make doc`
+
+Format code with PEP8 standard
+
+`$ make format`
