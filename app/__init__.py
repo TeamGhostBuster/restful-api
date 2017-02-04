@@ -1,7 +1,7 @@
 import os
+
 from flask import Flask
 from flask_mongoengine import MongoEngine
-
 
 config = {
     'prod': 'app.config.ProductionConfig',
