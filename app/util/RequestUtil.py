@@ -12,7 +12,8 @@ def get_auth_info():
     Verify the interity of token from the OAuth provider,
     then look up the database check if user exist or not.
     If the user does not exist, create a new user instead.
-    :return:
+
+    :return: user instance
     """
     if 'Access-Token' not in request.headers:
         return None
