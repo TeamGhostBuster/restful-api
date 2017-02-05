@@ -1,7 +1,9 @@
 from app import app
+from app.util.AuthUtil import *
 
 
 @app.route('/user/library', methods=['GET'])
+@authorized_required
 def get_user_reading_lists():
     """
     @api {get} /user/library Get user reading lists
@@ -29,4 +31,4 @@ def get_user_reading_lists():
             }]
         }
     """
-    pass
+    return '22', 200

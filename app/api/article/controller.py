@@ -1,4 +1,5 @@
 from app import app
+from app.util.AuthUtil import *
 
 
 @app.route('/user/article/:id', methods=['GET'])
