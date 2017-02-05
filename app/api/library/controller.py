@@ -31,4 +31,4 @@ def get_user_reading_lists():
             }]
         }
     """
-    return '22', 200
+    return 'success', 200

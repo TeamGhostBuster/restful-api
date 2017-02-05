@@ -7,7 +7,7 @@ from .RequestUtil import *
 
 def authorized_required(f):
     """
-    Decorated function that check if user is logged in
+    Decorated function that check if user's token is valid
 
     """
     @wraps(f)

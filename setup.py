@@ -6,5 +6,5 @@ setup(
     version="1.0",
     packages=find_packages(),
     include_package_data=False,
-    install_requires=["flask_oauthlib","mongoengine"],
+    install_requires=["flask","mongoengine", 'httplib2'],
 )

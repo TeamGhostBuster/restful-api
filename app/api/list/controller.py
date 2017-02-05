@@ -1,7 +1,9 @@
 from app import app
+from app.util.AuthUtil import *
 
 
 @app.route('/user/list/:id', methods=['GET'])
+@authorized_required
 def get_articles_from_list(list_id):
     """
     @api {get} /user/list/:id Get articles of a list
@@ -33,4 +35,4 @@ def get_articles_from_list(list_id):
             }]
         }
     """
-    pass
+    return 'success', 200

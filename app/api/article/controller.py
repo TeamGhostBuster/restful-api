@@ -3,6 +3,7 @@ from app.util.AuthUtil import *
 
 
 @app.route('/user/article/:id', methods=['GET'])
+@authorized_required
 def get_article(article_id):
     """
     @api {get} /user/article/:id Get a article
@@ -36,6 +37,6 @@ def get_article(article_id):
             }]
         }
     """
-    pass
+    return 'success', 200
 
 # TODO more resources for articles

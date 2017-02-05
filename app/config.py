@@ -1,10 +1,6 @@
 class BaseConfig(object):
     DEBUG = False
 
-    # MongoDB setting
-    MONGODB_HOST = 'localhost'
-    MONGODB_PORT = 27017
-
     # Oauth2 token setting
     SECRET_KEY = 'xxxxx'
     CONFIG = {

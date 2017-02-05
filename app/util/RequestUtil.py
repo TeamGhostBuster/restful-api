@@ -1,13 +1,22 @@
 from flask import request
 from app.config import *
-from app.api.user.model import User
+from app.util.MongoUtil import *
 import httplib2
 import json
 
 
 def get_auth_info():
-    # access_token = request.headers['Access-Token']
-    access_token = 'ya29.GlzpAy7pIMrPYhNACY7CQRyGw7PEerLFcXAuKC2Fz1NodEXC3YLdMoeNyMsTEDd12oWriEPNdSnhiiP7TYsfFLwB1EZzNq25Jby107vjyTOsBwd4sgcjDih-v53qpg'
+    """
+    Get user's identity
+
+    Verify the interity of token from the OAuth provider,
+    then look up the database check if user exist or not.
+    If the user does not exist, create a new user instead.
+    :return:
+    """
+    if 'Access-Token' not in request.headers:
+        return None
+    access_token = request.headers['Access-Token']
     if access_token is not None:
         # Check that the Access Token is valid.
         url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
@@ -16,11 +25,13 @@ def get_auth_info():
         result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
         if result.get('error') is not None:
             return None
-        # elif result['issued_to'] != BaseConfig.CONFIG['google']['client_key']:
-        #     return None
-        print(result)
-        print(result['email'])
-    user = User.objects(email_exact=result['email'])
-    print('hello')
+        elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
+            return None
+
+    user = find_user(result['email'])
+
     if user is None:
-        print("no")
+        print('creating')
+        user = create_user(result['email'])
+
+    return user

@@ -11,10 +11,10 @@ config = {
 
 # initialize flask instance
 app = Flask(__name__)
+app.config['MONGODB_DB'] = 'raspberry'
 
 # initialize MongoEngine instance
-db = MongoEngine()
-db.init_app(app)
+db = MongoEngine(app)
 
 # read environment variable from the system
 config_name = os.getenv('FLASK_CONFIGURATION')
