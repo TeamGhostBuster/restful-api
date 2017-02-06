@@ -1,6 +1,9 @@
 DOCS_DIR=doc
 MSG=Deploy API Documentation
 
+build:
+	@pipreqs . --force
+
 format:
 	@yapf -r -p app/*
 

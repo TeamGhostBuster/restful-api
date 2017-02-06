@@ -1,0 +1,20 @@
+version: '2'
+services:
+    flaskapp:
+        image: exiasr/alpine-flask:python3
+        container_name: flaskapp
+        ports:
+            - "5000:80"
+        volumes:
+            - .:/app
+        environment:
+            - FLASK_CONFIGURATION=deploy
+            - debug:debug1
+        restart: always
+        links:
+            - mongo
+    mongo:
+        image: mongo:3.4.1
+        container_name: mongo
+        ports:
+            - 27017:27017
