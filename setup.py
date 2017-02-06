@@ -6,5 +6,6 @@ setup(
     version="1.0",
     packages=find_packages(),
     include_package_data=False,
-    install_requires=["flask","mongoengine", 'httplib2'],
+    zip_safe=False,
+    install_requires=["flask", "mongoengine", 'httplib2'],
 )
