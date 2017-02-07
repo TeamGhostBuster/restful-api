@@ -1,8 +1,10 @@
 version: '2'
 services:
     flaskapp:
-        image: exiasr/alpine-flask:python3
+        image: exiasr/alpine-flask:latest
         container_name: flaskapp
+        networks:
+            - esnet
         ports:
             - "5000:80"
         volumes:
@@ -16,5 +18,11 @@ services:
     mongo:
         image: mongo:3.4.1
         container_name: mongo
+        networks:
+            - esnet
         ports:
             - 27017:27017
+
+networks:
+  esnet:
+    driver: bridge
