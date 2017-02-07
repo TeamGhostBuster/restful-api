@@ -1,6 +1,7 @@
 from flask import request
 from app.config import *
 from app.util.MongoUtil import *
+from app import app
 import httplib2
 import json
 
@@ -24,7 +25,7 @@ def get_auth_info():
                % access_token)
         h = httplib2.Http()
         result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
-        if result.get('error') is not None:
+        if result.get('error_description') is not None:
             return None
         elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
             return None
@@ -34,5 +35,8 @@ def get_auth_info():
     if user is None:
         print('creating')
         user = create_user(result['email'])
+
+    print(str(user))
+    app.logger.info('User: {} {}'.format(user, request.full_path))
 
     return user
