@@ -10,7 +10,7 @@ setup(
         "flask",
         "mongoengine",
         "flask-mongoengine",
-        "httplib2",
+        "requests",
         "setuptools"
     ],
 )
