@@ -37,6 +37,6 @@ def get_auth_info():
         user = create_user(result['email'])
 
     print(str(user))
-    app.logger.info('User: {} {}'.format(user, request.full_path))
+    app.logger.info('User: {} Path: [{}]'.format(user, request.full_path))
 
     return user
