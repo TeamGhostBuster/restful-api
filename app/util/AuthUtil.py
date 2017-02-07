@@ -12,8 +12,9 @@ def authorized_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        user = get_auth_info()
         if get_auth_info() is None:
             return jsonify({'msg': 'Unauthorized access'}), 401
-        return f(*args, **kwargs)
+        return f(user, **kwargs)
     return decorated_function
 
