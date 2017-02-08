@@ -1,6 +1,12 @@
 class BaseConfig(object):
     DEBUG = False
 
+    MONGODB_SETTINGS = {
+        'DB': 'raspberry',
+        'HOST': 'localhost',
+        'PORT': 27017
+    }
+
     # Oauth2 token setting
     SECRET_KEY = 'xxxxx'
     CONFIG = {
@@ -16,6 +22,12 @@ class ProductionConfig(BaseConfig):
 
 class DeployConfig(BaseConfig):
     DEBUG = True
+
+    MONGODB_SETTINGS = {
+        'DB': 'raspberry',
+        'HOST': 'mongo',
+        'PORT': 27017
+    }
 
 
 class DevelopmentConfig(BaseConfig):
