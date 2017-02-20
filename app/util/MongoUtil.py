@@ -26,14 +26,20 @@ def create_user(email):
 
 
 def find_list(list_id):
-    # Find user's list
-    user_list = List.objects(id=list_id)
-
-    # Check if exists
-    if List.objects(id__exact=list_id).count() == 0:
-        return None
+    try:
+        # Find user's list
+        user_list = List.objects.get(id=ObjectId(list_id))
+    except DoesNotExist:
+        pass
 
     return user_list
+
+
+def get_article_from_list(list):
+    articles = list.articles
+
+    for i in articles:
+        print(i.title)
 
 
 def create_list(list_name, user):

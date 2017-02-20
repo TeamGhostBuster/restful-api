@@ -1,11 +1,12 @@
 from app import app
 from app.util.AuthUtil import *
-from app.util.MongoUtil import *
+from app.util import MongoUtil
+from bson.objectid import ObjectId
 
 
-@app.route('/user/list/:id', methods=['GET'])
+@app.route('/user/list/<string:list_id>', methods=['GET'])
 @authorized_required
-def get_articles_from_list(list_id):
+def get_articles_from_list(user, list_id):
     """
     @api {get} /user/list/:id Get articles of a list
     @apiName Get articles of a list
@@ -38,7 +39,15 @@ def get_articles_from_list(list_id):
             ]
         }
     """
-    return 'success', 200
+    # check for bad list
+    if list_id is None:
+        return 'Bad request', 400
+
+    reading_list = List.objects.get(id=ObjectId(list_id))
+
+    # convert the articles into json format
+    
+    return jsonify(id=reading_list.id, name=reading_list.name, articles=reading_list.articles)
 
 
 @app.route('/user/list', methods=['POST'])
@@ -60,12 +69,13 @@ def create_list(user):
     @apiParam {String} name List name.
     """
     # Get list name from api parameter
-    list_name = get_parameter('name')
+    req = request.get_json()
+    list_name = req['name']
 
     # If missing parameter
     if list_name is None:
         return 'Bad request', 400
 
     # Create a new list
-    create_list(list_name, user)
-    return 'success', 200
+    MongoUtil.create_list(list_name, user)
+    return jsonify(msg='success'), 200

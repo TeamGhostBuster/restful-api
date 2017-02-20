@@ -32,5 +32,4 @@ class DeployConfig(BaseConfig):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    CLIENT_URL = 'demo.vfree.org'
-    SERVER_NAME = 'api.vfree.org:5000'
+
