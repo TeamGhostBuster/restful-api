@@ -1,8 +1,19 @@
 from app import app
 from app.util.AuthUtil import *
+from app.util import MongoUtil
+from flask import jsonify
+
+"""
+@apiDefine UnauthorizedAccessError
+@apiError UnauthorizedAccessError User's access token is not valid
+@apiErrorExample Error 401
+    {
+        "msg": "Unauthorized access"
+    }
+"""
 
 
-@app.route('/user/article/:id', methods=['GET'])
+@app.route('/user/article/<string:article_id>', methods=['GET'])
 @authorized_required
 def get_article(user, article_id):
     """
@@ -30,14 +41,25 @@ def get_article(user, article_id):
         {
             "id": "aldkfjadls",
             "title": "Process",
+            "description": "adlsfjdlask",
+            "url": "https://www.google.com/something",
             "list_id": "ladsjflas",
             "comments" : [{
                 "content": "i hate it",
                 "timestamp": "2017-02-04-19-59-59"
-            }]
+            }],
+            "tags": ["science", "computer"]
         }
+
+    @apiUse UnauthorizedAccessError
     """
-    return 'success', 200
+    article = MongoUtil.find_article(article_id)
+
+    if article is None:
+        return jsonify(msg='Articles does not exist'), 404
+
+    return jsonify(id=article.id, title=article.title,
+                   description=article.description, url=article.url), 200
 
 
 @app.route('/user/article', methods=['POST'])
@@ -62,6 +84,8 @@ def create_article(user):
         {
             "title": "God know what it is",
             "list_id": "aldkfjdaslkfjl",
+            "description": "I don't know",
+            "url": "https://www.gooel.com/something",
             "tags": {
                 "key1": "value1",
                 "key2": "value2"
@@ -69,6 +93,29 @@ def create_article(user):
         }
 
     @apiSuccess {String} Message Success message.
-    """
 
-    return 'success', 200
+    @apiUse UnauthorizedAccessError
+    """
+    # Parse request
+    req = request.get_json()
+    title = req.get('title')
+    list_id = req.get('list_id')
+    description = req.get('description')
+    url = req.get('url')
+    tags = req.get('tags')
+
+    # Validate request
+    if not 'title':
+        return jsonify({
+            'msg': 'Invalid request'
+        }), 400
+
+    # Create article
+    new_article = MongoUtil.create_article(title, list_id, description, url, tags)
+
+    if new_article is None:
+        return jsonify({
+            'msg': 'List does not exist'
+        }), 400
+
+    return jsonify({'msg': 'Success'}), 200
