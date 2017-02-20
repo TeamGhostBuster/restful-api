@@ -17,4 +17,3 @@ def authorized_required(f):
             return jsonify({'msg': 'Unauthorized access'}), 401
         return f(user, **kwargs)
     return decorated_function
-

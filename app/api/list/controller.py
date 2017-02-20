@@ -1,5 +1,6 @@
 from app import app
 from app.util.AuthUtil import *
+from app.util.MongoUtil import *
 
 
 @app.route('/user/list/:id', methods=['GET'])
@@ -29,10 +30,42 @@ def get_articles_from_list(list_id):
         {
             "id": "31ladsjfl",
             "name": "CMPUT 391 Seminar",
-            "articles": [{
-                "id": "adlfajdls",
-                "title": "Process"
-            }]
+            "articles": [
+                {
+                    "id": "adlfajdls",
+                    "title": "Process"
+                }
+            ]
         }
     """
+    return 'success', 200
+
+
+@app.route('/user/list', methods=['POST'])
+@authorized_required
+def create_list(user):
+    """
+    @api {get} /user/list Create a reading list
+    @apiName Create a reading list
+    @apiGroup List
+
+    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
+    @apiHeader {String} Provider-Name Oauth2 provider name.
+    @apiHeaderExample {json} Header (Example):
+        {
+            "Access-Token": "12xsdklajlkadsf",
+            "Provider-Name": "Google"
+        }
+
+    @apiParam {String} name List name.
+    """
+    # Get list name from api parameter
+    list_name = get_parameter('name')
+
+    # If missing parameter
+    if list_name is None:
+        return 'Bad request', 400
+
+    # Create a new list
+    create_list(list_name, user)
     return 'success', 200
