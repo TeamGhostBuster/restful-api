@@ -8,3 +8,24 @@ from .library import model as library_model
 from .list import model as list_model
 from .user import model as user_model
 from .group import model as group_model
+
+# APIDOC Inherit Doc
+
+
+"""
+@apiDefine UnauthorizedAccessError
+@apiError UnauthorizedAccessError User's access token is not valid
+@apiErrorExample Error 401
+    {
+        "msg": "Unauthorized access"
+    }
+"""
+
+"""
+@apiDefine ListDoesNotExist
+apiError ListDoesNotExist The list does not exist
+@apiErrorExample Error 400
+    {
+        "msg": "List does not exist"
+    }
+"""

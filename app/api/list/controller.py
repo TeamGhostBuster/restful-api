@@ -38,6 +38,8 @@ def get_articles_from_list(user, list_id):
                 }
             ]
         }
+
+    @apiUse UnauthorizedAccessError
     """
     # check for bad list
     if list_id is None:
@@ -67,6 +69,12 @@ def create_list(user):
         }
 
     @apiParam {String} name List name.
+    @apiParamExample {json} Request (Example)
+        {
+            "name": "CMPUT495 Seminar"
+        }
+
+    @apiUse UnauthorizedAccessError
     """
     # Get list name from api parameter
     req = request.get_json()

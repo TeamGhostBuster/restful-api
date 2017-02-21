@@ -3,15 +3,6 @@ from app.util.AuthUtil import *
 from app.util import MongoUtil
 from flask import jsonify
 
-"""
-@apiDefine UnauthorizedAccessError
-@apiError UnauthorizedAccessError User's access token is not valid
-@apiErrorExample Error 401
-    {
-        "msg": "Unauthorized access"
-    }
-"""
-
 
 @app.route('/user/article/<string:article_id>', methods=['GET'])
 @authorized_required
@@ -95,6 +86,7 @@ def create_article(user):
     @apiSuccess {String} Message Success message.
 
     @apiUse UnauthorizedAccessError
+    @apiUse ListDoesNotExist
     """
     # Parse request
     req = request.get_json()
@@ -148,8 +140,15 @@ def add_tags(user, article_id):
     @apiSuccess {String} Message Success message.
 
     @apiUse UnauthorizedAccessError
+    @apiUse ListDoesNotExist
     """
     req = request.get_json()
     tag = req.get('tag')
     article = MongoUtil.add_tag(article_id, tag)
+
+    if article is None:
+        return jsonify({
+            'msg': 'List does not exist'
+        }), 400
+
     return jsonify(msg='Success'), 200
