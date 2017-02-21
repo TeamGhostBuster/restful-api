@@ -151,4 +151,6 @@ def add_tags(user, article_id):
             'msg': 'List does not exist'
         }), 400
 
+    app.logger.info('User {} Add tag {} to {}'.format(user, tag, article))
+
     return jsonify(msg='Success'), 200
