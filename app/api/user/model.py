@@ -1,5 +1,8 @@
+from marshmallow import Schema, fields
+
 from app import db
 from app.api.list.model import List
+from app.api.list.model import ListSchema
 
 
 class User(db.Document):
@@ -12,4 +15,11 @@ class User(db.Document):
         return 'ID: {} Email: {}'.format(self.id, self.email)
 
     def __str__(self):
-        return '{{id:{}, first_name:{}, last_name:{}}}'.format(str(self.id), self.first_name, self.last_name)
+        return 'id:{}, first_name:{}, last_name:{}'.format(str(self.id), self.first_name, self.last_name)
+
+
+class UserSchema(Schema):
+    id = fields.String()
+    first_name = fields.Str()
+    last_name = fields.Str()
+    lists = fields.Nested(ListSchema, many=True, only={'id', 'name'})

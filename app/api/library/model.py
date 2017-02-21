@@ -1,6 +1,6 @@
+from app import db
 from app.api.list.model import List
 from app.api.user.model import User
-from app import db
 
 
 class Library(db.Document):

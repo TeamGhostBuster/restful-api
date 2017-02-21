@@ -1,7 +1,8 @@
-from app import app
-from app.util.AuthUtil import authorized_required, validate_id
-from app.util import MongoUtil, JsonUtil
 from flask import request, jsonify
+
+from app import app
+from app.util import MongoUtil, JsonUtil
+from app.util.AuthUtil import authorized_required, validate_id
 
 
 @app.route('/user/article/<string:article_id>/comment', methods=['POST'])

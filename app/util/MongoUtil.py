@@ -2,9 +2,9 @@ from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
 
 from app.api.article.model import Article
+from app.api.comment.model import Comment
 from app.api.library.model import List
 from app.api.user.model import User
-from app.api.comment.model import Comment
 
 
 def find_user(email):

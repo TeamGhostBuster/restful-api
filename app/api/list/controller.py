@@ -1,7 +1,5 @@
-from app import app
+from app.util import MongoUtil, JsonUtil
 from app.util.AuthUtil import *
-from app.util import MongoUtil
-from bson.objectid import ObjectId
 
 
 @app.route('/user/list/<string:list_id>', methods=['GET'])
@@ -12,13 +10,7 @@ def get_articles_from_list(user, list_id):
     @apiName Get articles of a list
     @apiGroup List
 
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
+    @apiUse AuthorizationTokenHeader
 
     @apiParam {String} id List unique ID.
 
@@ -41,15 +33,13 @@ def get_articles_from_list(user, list_id):
 
     @apiUse UnauthorizedAccessError
     """
+    reading_list = MongoUtil.find_list(list_id)
     # check for bad list
-    if list_id is None:
-        return 'Bad request', 400
-
-    reading_list = List.objects.get(id=ObjectId(list_id))
+    if reading_list is None:
+        return jsonify(msg='List does not exist'), 404
 
     # convert the articles into json format
-    
-    return jsonify(id=reading_list.id, name=reading_list.name, articles=reading_list.articles)
+    return jsonify(JsonUtil.serialize(reading_list)), 200
 
 
 @app.route('/user/list', methods=['POST'])
@@ -60,13 +50,7 @@ def create_list(user):
     @apiName Create a reading list
     @apiGroup List
 
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
+    @apiUse AuthorizationTokenHeader
 
     @apiParam {String} name List name.
     @apiParamExample {json} Request (Example)
@@ -89,4 +73,36 @@ def create_list(user):
 
     app.logger.info('User {} Create list'.format(user, new_list))
 
-    return jsonify(msg='success'), 200
+    return jsonify(JsonUtil.serialize(new_list)), 200
+
+
+@app.route('/user/lists', methods=['GET'])
+@authorized_required
+def get_user_reading_lists(user):
+    """
+    @api {get} /user/lists Get user all reading lists
+    @apiName Get user reading lists
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiSuccess {String} id User id
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse UnauthorizedAccessError
+    """
+
+    app.logger.info('User: {} Access: [{}]'.format(user, request.full_path))
+    return jsonify(JsonUtil.serialize(user)), 200

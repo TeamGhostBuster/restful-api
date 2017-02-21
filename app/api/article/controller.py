@@ -11,13 +11,7 @@ def get_article(user, article_id):
     @apiName Get a article
     @apiGroup Article
 
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
+    @apiUse AuthorizationTokenHeader
 
     @apiParam {String} id Article unique ID.
 
@@ -60,13 +54,7 @@ def create_article(user):
     @apiName Create a article
     @apiGroup Article
 
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
+    @apiUse AuthorizationTokenHeader
 
     @apiParam {String} title The article title.
     @apiParam {Json} tags The user custom tags.
@@ -107,7 +95,7 @@ def create_article(user):
         }), 400
 
     app.logger.info('User {} Create article {}'.format(user, new_article))
-    return jsonify({'msg': 'Success'}), 200
+    return jsonify(JsonUtil.serialize(new_article)), 200
 
 
 @app.route('/user/article/<string:article_id>/tag')
@@ -118,13 +106,7 @@ def add_tags(user, article_id):
     @apiName Create a article
     @apiGroup Article
 
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
+    @apiUse AuthorizationTokenHeader
 
     @apiParam {String} title The article title.
     @apiParam {Json} tags The user custom tags.
@@ -149,4 +131,4 @@ def add_tags(user, article_id):
 
     app.logger.info('User {} Add tag {} to {}'.format(user, tag, article))
 
-    return jsonify(msg='Success'), 200
+    return jsonify(JsonUtil.serialize(article)), 200
