@@ -1,8 +1,10 @@
 from app import app
 import requests
 from flask import request
+from bson.objectid import ObjectId, InvalidId
 from app.config import *
 from app.util.MongoUtil import *
+import os
 
 
 def get_auth_info():
@@ -20,31 +22,57 @@ def get_auth_info():
 
     access_token = request.headers['Access-Token']
     if access_token is not None:
-        # Check that the Access Token is valid.
-        url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
-               % access_token)
-        result = requests.get(url).json()
-        if result.get('error_description') is not None:
-            return None
-        elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
-            return None
+        # For development purpose only
+        if os.getenv('FLASK_CONFIGURATION') == 'dev':
+            if access_token in app.config['TEST_TOKEN'].keys():
+                user = find_user(app.config['TEST_TOKEN'][access_token])
+            else:
+                # Check that the Access Token is valid.
+                url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
+                       % access_token)
+                result = requests.get(url).json()
+                if result.get('error_description') is not None:
+                    return None
+                elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
+                    return None
+                user = find_user(result['email'])
+        else:
+            # Check that the Access Token is valid.
+            url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
+                   % access_token)
+            result = requests.get(url).json()
+            if result.get('error_description') is not None:
+                return None
+            elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
+                return None
+            user = find_user(result['email'])
 
-    user = find_user(result['email'])
     if user is None:
         # if user does not exist, create a new user instead
         app.logger.info('Create User: {}'.format(user))
-        user = create_user(result['email'])
+        first_name, last_name = get_user_profile(access_token)
+        user = create_user(result['email'], first_name, last_name)
 
     return user
 
 
-def get_parameter(key, default=None):
-    # Get parameter
-    if request.method == 'POST':
-        param = request.args.get(key, default)
-    elif request.method == 'GET':
-        param = request.args.get(key, default)
-    else:
-        return default
+def get_user_profile(access_token):
+    url = 'https://www.googleapis.com/plus/v1/people/me?access_token={}'.format(access_token)
+    result = requests.get(url).json()
+    if result.get('error') is not None:
+        return None
+    return result['name']['givenName'], result['name']['familyName']
 
-    return param
+
+def validate_id(objectid):
+    """
+    Validate the incoming objectid of item
+    :param objectid: The id in string
+    :return: True/False
+    """
+    try:
+        ObjectId(objectid)
+    except InvalidId:
+        return False
+
+    return True

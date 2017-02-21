@@ -4,6 +4,7 @@ from flask_mongoengine import DoesNotExist
 from app.api.article.model import Article
 from app.api.library.model import List
 from app.api.user.model import User
+from app.api.comment.model import Comment
 
 
 def find_user(email):
@@ -18,9 +19,9 @@ def find_user(email):
     return user
 
 
-def create_user(email):
+def create_user(email, first_name, last_name):
     # Create new user
-    new_user = User(email=email).save()
+    new_user = User(email=email, first_name=first_name, last_name=last_name).save()
 
     return new_user
 
@@ -88,3 +89,16 @@ def add_tag(article_id, tag):
     article.reload()
 
     return article
+
+
+def add_comment(user, article_id, comment, public=True):
+    # Check if the article exists
+    if find_article(article_id) is None:
+        return None
+
+    # Post comment
+    new_comment = Comment(content=comment, article=article_id, public=public,
+                          user=user).save()
+
+    return new_comment
+

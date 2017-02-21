@@ -33,3 +33,9 @@ class DeployConfig(BaseConfig):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
 
+    # Access token for testing
+    TEST_TOKEN = {
+        'michaellam.lzc': 'michaellam.lzc@gmail.com',
+        'zichun3': 'zichun3@ualberta.ca',
+        'sdlarsen': 'sdlarsen@ualberta.ca'
+    }

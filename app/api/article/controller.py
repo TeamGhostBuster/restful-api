@@ -35,6 +35,7 @@ def get_article(user, article_id):
             "url": "https://www.google.com/something",
             "list_id": "ladsjflas",
             "comments" : [{
+                "id": "afjlkdsfjafla",
                 "content": "i hate it",
                 "timestamp": "2017-02-04-19-59-59"
             }],
