@@ -24,12 +24,10 @@ def get_user_reading_lists(user):
     @apiSuccessExample {json} Response (Example):
         {
             "id": "31ladsjfl",
-            "lists": [
-                {
-                    "id": "adlfajdls",
-                    "name": "Process"
-                }
-            ]
+            "lists": [{
+                "id": "adlfajdls",
+                "name": "Process"
+            }]
         }
     """
     app.logger.info('User: {} Access: [{}]'.format(user, request.full_path))
