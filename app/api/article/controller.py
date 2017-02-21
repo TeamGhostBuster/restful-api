@@ -1,7 +1,6 @@
-from app import app
-from app.util.AuthUtil import *
+from app.util import JsonUtil
 from app.util import MongoUtil
-from flask import jsonify
+from app.util.AuthUtil import *
 
 
 @app.route('/user/article/<string:article_id>', methods=['GET'])
@@ -49,8 +48,7 @@ def get_article(user, article_id):
     if article is None:
         return jsonify(msg='Articles does not exist'), 404
 
-    return jsonify(id=article.id, title=article.title,
-                   description=article.description, url=article.url), 200
+    return jsonify(JsonUtil.serialize(article)), 200
 
 
 @app.route('/user/article', methods=['POST'])
@@ -77,10 +75,7 @@ def create_article(user):
             "list_id": "aldkfjdaslkfjl",
             "description": "I don't know",
             "url": "https://www.gooel.com/something",
-            "tags": {
-                "key1": "value1",
-                "key2": "value2"
-            }
+            "tags": ["tag1", "tag2", "tag3"]
         }
 
     @apiSuccess {String} Message Success message.
@@ -110,7 +105,7 @@ def create_article(user):
             'msg': 'List does not exist'
         }), 400
 
-    app.logger.info('User {} Create article {} '.format(user, new_article))
+    app.logger.info('User {} Create article {}'.format(user, new_article))
     return jsonify({'msg': 'Success'}), 200
 
 

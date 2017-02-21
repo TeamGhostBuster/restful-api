@@ -1,3 +1,5 @@
+from marshmallow import Schema, fields
+
 from app import db
 
 
@@ -12,3 +14,18 @@ class Article(db.Document):
 
     def __str__(self):
         return 'ID: {} Title: {}'.format(self.id, self.title)
+
+
+class ArticleSchema(Schema):
+    """
+    JSON Serialization and Deserialization
+    """
+    id = fields.String()
+    title = fields.Str()
+    description = fields.Str()
+    url = fields.Url()
+    tags = fields.List(fields.Str())
+
+    class Meta:
+        fields = ('id', 'title', 'description', 'url', 'tags')
+        ordered = True
