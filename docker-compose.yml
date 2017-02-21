@@ -20,9 +20,15 @@ services:
         container_name: mongo
         networks:
             - esnet
+        volumes:
+            - esdata:/data/db
         ports:
             - 27017:27017
 
 networks:
   esnet:
     driver: bridge
+
+volumes:
+    esdata:
+        driver: local
