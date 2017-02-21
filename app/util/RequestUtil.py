@@ -1,8 +1,8 @@
+from app import app
+import requests
 from flask import request
 from app.config import *
 from app.util.MongoUtil import *
-from app import app
-import requests
 
 
 def get_auth_info():
@@ -36,3 +36,15 @@ def get_auth_info():
         user = create_user(result['email'])
 
     return user
+
+
+def get_parameter(key, default=None):
+    # Get parameter
+    if request.method == 'POST':
+        param = request.args.get(key, default)
+    elif request.method == 'GET':
+        param = request.args.get(key, default)
+    else:
+        return default
+
+    return param

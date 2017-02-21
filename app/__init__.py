@@ -21,11 +21,12 @@ app.config.from_object(config[config_name])
 # initialize MongoEngine instance
 db = MongoEngine(app)
 
-file_handler = RotatingFileHandler('info.log', maxBytes=10000, backupCount=1)
-file_handler.setFormatter(Formatter(
-    '%(asctime)s %(levelname)s: %(message)s '
-))
-app.logger.addHandler(file_handler)
+# Disable log file for now due to some wired permission error
+# file_handler = RotatingFileHandler('/var/log/info.log', maxBytes=10000, backupCount=1)
+# file_handler.setFormatter(Formatter(
+#     '%(asctime)s %(levelname)s: %(message)s '
+# ))
+# app.logger.addHandler(file_handler)
 
 # import api module
 from app import api
