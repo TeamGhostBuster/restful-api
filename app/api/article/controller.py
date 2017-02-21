@@ -105,7 +105,7 @@ def create_article(user):
     tags = req.get('tags')
 
     # Validate request
-    if not 'title':
+    if not 'title' or not 'list_id':
         return jsonify({
             'msg': 'Invalid request'
         }), 400
@@ -119,3 +119,36 @@ def create_article(user):
         }), 400
 
     return jsonify({'msg': 'Success'}), 200
+
+
+@app.route('/user/article/<string:article_id>/tag')
+@authorized_required
+def add_tags(user, article_id):
+    """
+    @api {post} /user/article/ Create a article
+    @apiName Create a article
+    @apiGroup Article
+
+    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
+    @apiHeader {String} Provider-Name Oauth2 provider name.
+    @apiHeaderExample {json} Header (Example):
+        {
+            "Access-Token": "12xsdklajlkadsf",
+            "Provider-Name": "Google"
+        }
+
+    @apiParam {String} title The article title.
+    @apiParam {Json} tags The user custom tags.
+    @apiParamExample {json} Request (Example):
+        {
+            "tag": "science"
+        }
+
+    @apiSuccess {String} Message Success message.
+
+    @apiUse UnauthorizedAccessError
+    """
+    req = request.get_json()
+    tag = req.get('tag')
+    article = MongoUtil.add_tag(article_id, tag)
+    return jsonify(msg='Success'), 200

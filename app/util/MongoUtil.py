@@ -75,3 +75,16 @@ def find_article(article_id):
         return None
 
     return article
+
+
+def add_tag(article_id, tag):
+    try:
+        article = Article.objects.get(id=ObjectId(article_id))
+    except DoesNotExist:
+        return None
+
+    # Add tag to article
+    Article.objects(id=ObjectId(article_id)).update_one(push__tags=tag)
+    article.reload()
+
+    return article
