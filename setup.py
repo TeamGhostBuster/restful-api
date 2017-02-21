@@ -11,6 +11,6 @@ setup(
         "mongoengine",
         "flask-mongoengine",
         "requests",
-        "setuptools", 'marshmallow'
+        "setuptools"
     ],
 )

@@ -1,5 +1,4 @@
-.PHONY: all clean doc
-
+DOCS_DIR=doc
 MSG=Deploy API Documentation
 
 build:
@@ -9,8 +8,8 @@ format:
 	@yapf -r -p app/*
 
 doc:
-	apidoc -i app/ doc/
-	ghp-import -n -p -m $MSG doc/
+	apidoc -i app/ $DOCS_DIR
+	ghp-import -n -p -m $MSG $DOCS_DIR
 
 clean:
 	@rm -rf $DOCS_DIR dist/ build/ app.egg-info/
