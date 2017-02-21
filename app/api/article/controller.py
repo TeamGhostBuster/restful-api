@@ -118,6 +118,7 @@ def create_article(user):
             'msg': 'List does not exist'
         }), 400
 
+    app.logger.info('User {} Create article {} '.format(user, new_article))
     return jsonify({'msg': 'Success'}), 200
 
 

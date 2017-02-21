@@ -77,5 +77,8 @@ def create_list(user):
         return 'Bad request', 400
 
     # Create a new list
-    MongoUtil.create_list(list_name, user)
+    new_list = MongoUtil.create_list(list_name, user)
+
+    app.logger.info('User {} Create list'.format(user, new_list))
+
     return jsonify(msg='success'), 200
