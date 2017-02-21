@@ -1,5 +1,5 @@
-from flask_mongoengine import DoesNotExist
 from bson.objectid import ObjectId
+from flask_mongoengine import DoesNotExist
 
 from app.api.article.model import Article
 from app.api.library.model import List
