@@ -14,6 +14,12 @@
 
   `127.0.0.1 api.vfree.org localhost`
   
+## Usage
+Access from `https://api.vfree.org`
+
+Documentation: [https://teamghostbuster.github.io/restful-api/](https://teamghostbuster.github.io/restful-api/)
+
+
 ## Tools
 Build documentation with APIDOC
 
