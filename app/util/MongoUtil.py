@@ -36,64 +36,6 @@ def find_list(list_id):
     return user_list
 
 
-def archive_list(user, list_id):
-    try:
-        # Get the list
-        archived_list = List.objects.get(id=ObjectId(list_id))
-    except DoesNotExist:
-        return None
-
-    # Check if user has permission or not
-    if archive_list not in user.list:
-        return None
-
-    # Mark it as archived
-    List.objects(id=archived_list.id).update_one(archived=True)
-
-    user.reload()
-
-    return user
-
-
-def retrieve_list(user, list_id):
-    try:
-        retrieved_list = List.objects.get(id=ObjectId(list_id))
-    except DoesNotExist:
-        return None
-
-    # Check if user has permission or not
-    if archive_list not in user.list:
-        return None
-
-    # Mark it as not archived
-    List.objects(id=retrieved_list.id).update_one(archived=False)
-
-    user.reload()
-
-    return user
-
-# def get_user_all_lists(user):
-#     # user = User.objects.get(id=user.id, lists__)
-#     pipeline = [
-#         {'$match': {'email': 'michaellam.lzc@gmail.com'}},
-#         {'$unwind': '$lists'},
-#         {'$lookup': {
-#             'from': 'list',
-#             'localField': 'lists',
-#             'foreignField': '_id',
-#             'as': 'listObj'
-#         }},
-#         {'$unwind': '$listObj'},
-#         {'$match': {'listObj.archived': {'$ne': 'true'}}},
-#         {'$group': {'_id': '$_id',
-#                     'email': {'$first': '$email'},
-#                     'last_name': {'$first': '$last_name'},
-#                     'first_name': {'$first': 'first_name'},
-#                     'lists': {'$push': '$lists'}}}
-#     ]
-#     pass
-
-
 def get_article_from_list(list):
     articles = list.articles
 
