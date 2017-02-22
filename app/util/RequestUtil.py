@@ -1,5 +1,3 @@
-import os
-
 import requests
 from bson.objectid import InvalidId
 from flask import request
@@ -25,19 +23,8 @@ def get_auth_info():
     access_token = request.headers['Access-Token']
     if access_token is not None:
         # For development purpose only
-        if os.getenv('FLASK_CONFIGURATION') == 'dev':
-            if access_token in app.config['TEST_TOKEN'].keys():
-                user = find_user(app.config['TEST_TOKEN'][access_token])
-            else:
-                # Check that the Access Token is valid.
-                url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
-                       % access_token)
-                result = requests.get(url).json()
-                if result.get('error_description') is not None:
-                    return None
-                elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
-                    return None
-                user = find_user(result['email'])
+        if access_token in app.config['TEST_TOKEN'].keys():
+            user = find_user(app.config['TEST_TOKEN'][access_token])
         else:
             # Check that the Access Token is valid.
             url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
@@ -47,6 +34,7 @@ def get_auth_info():
                 return None
             elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
                 return None
+
             user = find_user(result['email'])
 
     if user is None:

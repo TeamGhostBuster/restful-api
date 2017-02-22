@@ -76,6 +76,36 @@ def create_list(user):
     return jsonify(JsonUtil.serialize(new_list)), 200
 
 
+@app.route('/user/list/<string:list_id>/article/<string:article_id>', methods=['DELETE'])
+@authorized_required
+def delete_article(user, list_id, article_id):
+    """
+    @api {delete} /user/list/:list_id/article/:article_id Delete an article
+    @apiName Delete an article from a list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} list_id The list id.
+    @apiParam {String} article_id The article id.
+
+    @apiSuccess {JSON} List the new list in json string.
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ListDoesNotExist
+    @apiUser ArticleDoesNotExist
+    """
+    # Delete the article from the list
+    the_list = MongoUtil.delete_article(user, list_id, article_id)
+
+    if the_list is None:
+        return jsonify(msg='List/Article does not exists'), 400
+
+    app.logger.info('User {} Delete article {} From list {}'.format(user, article_id, list_id))
+
+    return jsonify(JsonUtil.serialize(the_list)), 200
+
+
 @app.route('/user/lists', methods=['GET'])
 @authorized_required
 def get_user_reading_lists(user):
@@ -103,6 +133,5 @@ def get_user_reading_lists(user):
 
     @apiUse UnauthorizedAccessError
     """
-
     app.logger.info('User: {} Access: [{}]'.format(user, request.full_path))
     return jsonify(JsonUtil.serialize(user)), 200

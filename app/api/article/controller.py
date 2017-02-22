@@ -98,7 +98,7 @@ def create_article(user):
     return jsonify(JsonUtil.serialize(new_article)), 200
 
 
-@app.route('/user/article/<string:article_id>/tag')
+@app.route('/user/article/<string:article_id>/tag', methods=['POST'])
 @authorized_required
 def add_tags(user, article_id):
     """

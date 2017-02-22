@@ -3,7 +3,7 @@ class BaseConfig(object):
 
     MONGODB_SETTINGS = {
         'DB': 'raspberry',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'PORT': 27017
     }
 
@@ -13,6 +13,13 @@ class BaseConfig(object):
         'google': {
             'client_key': '224926533228-4jcfs0862eib0vo9j81b9d6h8agqh30f.apps.googleusercontent.com',
         }
+    }
+
+    # Access token for testing
+    TEST_TOKEN = {
+        'michaellam.lzc': 'michaellam.lzc@gmail.com',
+        'zichun3': 'zichun3@ualberta.ca',
+        'sdlarsen': 'sdlarsen@ualberta.ca'
     }
 
 
@@ -32,10 +39,3 @@ class DeployConfig(BaseConfig):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-
-    # Access token for testing
-    TEST_TOKEN = {
-        'michaellam.lzc': 'michaellam.lzc@gmail.com',
-        'zichun3': 'zichun3@ualberta.ca',
-        'sdlarsen': 'sdlarsen@ualberta.ca'
-    }

@@ -4,6 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 from flask_mongoengine import MongoEngine
+from flask_cors import CORS, cross_origin
 
 config = {
     'prod': 'app.config.ProductionConfig',
@@ -20,6 +21,8 @@ app.config.from_object(config[config_name])
 
 # initialize MongoEngine instance
 db = MongoEngine(app)
+
+CORS(app)
 
 # Disable log file for now due to some wired permission error
 # file_handler = RotatingFileHandler('/var/log/info.log', maxBytes=10000, backupCount=1)

@@ -15,7 +15,7 @@ class User(db.Document):
         return 'ID: {} Email: {}'.format(self.id, self.email)
 
     def __str__(self):
-        return 'id:{}, first_name:{}, last_name:{}'.format(str(self.id), self.first_name, self.last_name)
+        return 'id:{}, email:{}'.format(self.id, self.email)
 
 
 class UserSchema(Schema):

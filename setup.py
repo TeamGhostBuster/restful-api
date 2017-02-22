@@ -11,6 +11,8 @@ setup(
         "mongoengine",
         "flask-mongoengine",
         "requests",
-        "setuptools", 'marshmallow'
+        "setuptools",
+        'marshmallow',
+        'flask-cors'
     ],
 )

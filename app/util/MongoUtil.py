@@ -91,6 +91,30 @@ def add_tag(article_id, tag):
     return article
 
 
+def delete_article(user, list_id, article_id):
+    # Retrieve the articled and list to be deleted
+    try:
+        the_list = List.objects.get(id=ObjectId(list_id))
+        the_article = Article.objects.get(id=ObjectId(article_id))
+    except DoesNotExist:
+        return None
+
+    # Check if user has permission to the list
+    if the_list not in user.lists:
+        return None
+
+    # Check if the article exists in the list
+    if the_article not in the_list.articles:
+        return None
+
+    # Remove the article from the list
+    List.objects(id=the_list.id).update_one(pull__articles=the_article)
+
+    the_list.reload()
+
+    return the_list
+
+
 def add_comment(user, article_id, comment, public=True):
     # Check if the article exists
     if find_article(article_id) is None:

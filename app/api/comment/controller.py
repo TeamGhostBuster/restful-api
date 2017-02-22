@@ -41,4 +41,6 @@ def add_comment(user, article_id):
     if new_comment is None:
         return jsonify(msg='Article does not exist'), 400
 
+    app.logger.info('User {} Create comment {}'.format(user, new_comment.id))
+
     return jsonify(JsonUtil.serialize(new_comment))
