@@ -5,6 +5,8 @@ from app.api.article.model import Article
 from app.api.comment.model import Comment
 from app.api.library.model import List
 from app.api.user.model import User
+from app.api.comment.model import Comment
+from app.api.group.model import Group
 
 
 def find_user(email):
@@ -78,6 +80,26 @@ def find_article(article_id):
     return article
 
 
+def add_article_to_list(list_id, article_id):
+    # Find the article
+    try:
+        article = find_article(article_id)
+    except DoesNotExist:
+        return None
+
+    # Find the list
+    try:
+        reading_list = find_list(list_id)
+    except DoesNotExist:
+        return None
+
+    # Add the article to the list
+    List.objects(id=ObjectId(article_id)).update_one(push__articles=article)
+    reading_list.reload()
+
+    return reading_list
+
+
 def add_tag(article_id, tag):
     try:
         article = Article.objects.get(id=ObjectId(article_id))
@@ -126,3 +148,64 @@ def add_comment(user, article_id, comment, public=True):
 
     return new_comment
 
+
+def create_group(group_name, moderator, members=None, description=None):
+
+    # Create group
+    new_group = Group(name=group_name, moderator=moderator, description=description).save()
+
+    # Add moderator to members
+    Group.objects(id=new_group.id).update_one(push__members=moderator)
+
+    # Add members if not null
+    if members is not None:
+        for id in members:
+            try:
+                member = User.objects.get(id=ObjectId(id))
+                Group.objects(id=new_group.id).update_one(push__members=member)
+            except DoesNotExist:
+                return None
+
+    new_group.reload()
+    return new_group
+
+
+def find_group(group_id):
+    try:
+        # Find group
+        reading_group = Group.objects.get(id=ObjectId(group_id))
+    except DoesNotExist:
+        return None
+    return reading_group
+
+
+def add_group_member(group_id, member_id):
+    # Find the group
+    try:
+        reading_group = find_group(group_id)
+    except DoesNotExist:
+        return None
+
+    # Check that new member exists
+    try:
+        new_member = User.objects.get(id=ObjectId(member_id))
+    except DoesNotExist:
+        return None
+
+    # Add group member
+    Group.objects(id=ObjectId(group_id)).update_one(push__members=new_member)
+    reading_group.reload()
+
+    return reading_group
+
+
+def create_group_list(list_name, group_id):
+    # Create list
+    new_list = List(name=list_name).save()
+
+    # Append list reference to the group's list of lists
+    try:
+        Group.objects(id=ObjectId(group_id)).update_one(push__lists=new_list)
+        return new_list
+    except DoesNotExist:
+        return None

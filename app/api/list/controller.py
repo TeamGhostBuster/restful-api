@@ -1,5 +1,7 @@
 from app.util import MongoUtil, JsonUtil
 from app.util.AuthUtil import *
+from app.util import MongoUtil
+from app.util import JsonUtil
 
 
 @app.route('/user/list/<string:list_id>', methods=['GET'])
@@ -46,7 +48,7 @@ def get_articles_from_list(user, list_id):
 @authorized_required
 def create_list(user):
     """
-    @api {get} /user/list Create a reading list
+    @api {post} /user/list Create a reading list
     @apiName Create a reading list
     @apiGroup List
 
@@ -135,3 +137,73 @@ def get_user_reading_lists(user):
     """
     app.logger.info('User: {} Access: [{}]'.format(user, request.full_path))
     return jsonify(JsonUtil.serialize(user)), 200
+
+
+@app.route('/group/list', methods=['POST'])
+@authorized_required
+def create_group_list(user):
+    """
+    @api {post} /user/list Create a reading list
+    @apiName Create a reading list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} name List name.
+    @apiParamExample {json} Request (Example)
+        {
+            "name": "CMPUT495 Seminar"
+            "group_id": "834jlkkasd9"
+        }
+
+    @apiUse UnauthorizedAccessError
+    """
+    # Get list name from api parameter
+    req = request.get_json()
+    list_name = req['name']
+    group_id = req['group_id']
+
+    # If missing parameter
+    if list_name is None:
+        return 'Bad request', 400
+
+    # Create a new list
+    new_list = MongoUtil.create_group_list(list_name, group_id)
+    if new_list is None:
+        return jsonify(msg='Bad Request.'), 200
+
+    app.logger.info('User {} Create list'.format(group_id, new_list))
+
+    return jsonify(JsonUtil.serialize(new_list)), 200
+
+
+@app.route('user/list/<string:list_id>/articles', methods=['POST'])
+@authorized_required
+def add_article_to_user_list(user, list_id):
+    req = request.get_json()
+    article_id = req.get['article']
+
+    reading_list = MongoUtil.add_article_to_list(list_id, article_id)
+
+    if reading_list is None:
+        return jsonify(msg="List does not exist."), 400
+
+    app.logger.info("User {} add article {} to list {}".format(user, article_id, list_id))
+
+    return jsonify(JsonUtil.serialize(reading_list)), 200
+
+
+@app.route('group/list/<string:list_id>/articles', methods=['POST'])
+@authorized_required
+def add_article_to_group_list(user, list_id):
+    req = request.get_json()
+    article_id = req.get['article']
+
+    reading_list = MongoUtil.add_article_to_list(list_id, article_id)
+
+    if reading_list is None:
+        return jsonify(msg="List does not exist."), 400
+
+    app.logger.info("User {} add article {} to list {}".format(user, article_id, list_id))
+
+    return jsonify(JsonUtil.serialize(reading_list)), 200

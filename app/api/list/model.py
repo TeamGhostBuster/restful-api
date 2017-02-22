@@ -2,6 +2,7 @@ from marshmallow import Schema, fields
 
 from app import db
 from app.api.article.model import Article, ArticleSchema
+from marshmallow import Schema, fields
 
 
 class List(db.Document):
