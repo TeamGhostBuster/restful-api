@@ -7,6 +7,7 @@ from app.api.article.model import Article, ArticleSchema
 class List(db.Document):
     name = db.StringField(required=True)
     articles = db.ListField(db.ReferenceField(Article))
+    archived = db.BooleanField(default=False)
 
     def __repr__(self):
         return str(self)
@@ -22,7 +23,8 @@ class ListSchema(Schema):
     id = fields.String()
     name = fields.String()
     articles = fields.Nested(ArticleSchema, many=True, only=('id', 'title'))
+    archived = fields.Boolean()
 
     class Meta:
-        fields = ('id', 'name', 'articles')
+        fields = ('id', 'name', 'articles', 'archived')
         ordered = True

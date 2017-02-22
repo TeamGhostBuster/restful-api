@@ -46,7 +46,7 @@ def get_articles_from_list(user, list_id):
 @authorized_required
 def create_list(user):
     """
-    @api {get} /user/list Create a reading list
+    @api {post} /user/list Create a reading list
     @apiName Create a reading list
     @apiGroup List
 
@@ -93,7 +93,7 @@ def delete_article(user, list_id, article_id):
 
     @apiUse UnauthorizedAccessError
     @apiUse ListDoesNotExist
-    @apiUser ArticleDoesNotExist
+    @apiUse ArticleDoesNotExist
     """
     # Delete the article from the list
     the_list = MongoUtil.delete_article(user, list_id, article_id)
@@ -104,6 +104,88 @@ def delete_article(user, list_id, article_id):
     app.logger.info('User {} Delete article {} From list {}'.format(user, article_id, list_id))
 
     return jsonify(JsonUtil.serialize(the_list)), 200
+
+
+@app.route('/user/list/<string:list_id>/archive', methods=['DELETE'])
+@authorized_required
+def archive_list(user, list_id):
+    """
+    @api {delete} /user/list/:id/archive Archive a list
+    @apiName Archive a list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} list_id The list id.
+
+    @apiSuccess {String} id User id
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "archived": "True",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ListDoesNotExist
+    """
+    user = MongoUtil.archive_list(user, list_id)
+
+    # If the list do
+    if user is None:
+        return jsonify(msg='List does not exist'), 400
+
+    return jsonify(JsonUtil.serialize(user))
+
+
+@app.route('/user/list/<string:list_id>/retrieve', methods=['PUT'])
+@authorized_required
+def retrieve_list(user, list_id):
+    """
+    @api {put} /user/list/:id/retrieve Retrieve a list
+    @apiName Retrieve a list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} id The list id.
+
+    @apiSuccess {String} id User id
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "archived": "False",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ListDoesNotExist
+    """
+    user = MongoUtil.retrieve_list(user, list_id)
+
+    # If the list do
+    if user is None:
+        return jsonify(msg='List does not exist'), 400
+
+    return jsonify(JsonUtil.serialize(user))
 
 
 @app.route('/user/lists', methods=['GET'])
@@ -119,6 +201,7 @@ def get_user_reading_lists(user):
     @apiSuccess {String} id User id
     @apiSuccess {Object[]} lists Lists data
     @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
     @apiSuccess {String} lists.name List name
     @apiSuccessExample {json} Response (Example):
         {
@@ -126,6 +209,7 @@ def get_user_reading_lists(user):
             "lists": [
                 {
                     "id": "adlfajdls",
+                    "archived": "True",
                     "name": "Process"
                 }
             ]

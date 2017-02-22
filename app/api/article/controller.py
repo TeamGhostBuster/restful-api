@@ -13,7 +13,7 @@ def get_article(user, article_id):
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} id Article unique ID.
+    @apiParam {String} id Article unique ID (Required).
 
     @apiSuccess {String} id Article id.
     @apiSuccess {String} title Article title.
@@ -56,8 +56,11 @@ def create_article(user):
 
     @apiUse AuthorizationTokenHeader
 
+    @apiParam {String} list_id The list id.
     @apiParam {String} title The article title.
-    @apiParam {Json} tags The user custom tags.
+    @apiParam {String} description The description.
+    @apiParam {String} [url] The url to the article.
+    @apiParam {Json} [tags] The user custom tags.
     @apiParamExample {json} Request (Example):
         {
             "title": "God know what it is",
@@ -102,13 +105,13 @@ def create_article(user):
 @authorized_required
 def add_tags(user, article_id):
     """
-    @api {post} /user/article/ Create a article
-    @apiName Create a article
+    @api {post} /user/article/:id/tag Add tag to article
+    @apiName Add tag to the article
     @apiGroup Article
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} title The article title.
+    @apiParam {String} id The article id.
     @apiParam {Json} tags The user custom tags.
     @apiParamExample {json} Request (Example):
         {

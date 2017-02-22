@@ -22,4 +22,4 @@ class UserSchema(Schema):
     id = fields.String()
     first_name = fields.Str()
     last_name = fields.Str()
-    lists = fields.Nested(ListSchema, many=True, only={'id', 'name'})
+    lists = fields.Nested(ListSchema, many=True, only={'id', 'name', 'archived'})
