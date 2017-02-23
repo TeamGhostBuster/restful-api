@@ -267,3 +267,12 @@ def create_group_list(list_name, group_id):
         return new_list
     except DoesNotExist:
         return None
+
+
+def get_user_groups(user):
+    groups = Group.objects(members=user)
+
+    if Group.objects(members=user).count() == 0:
+        return None
+
+    return groups
