@@ -46,6 +46,7 @@ def get_article(user, article_id):
     if article is None:
         return jsonify(msg='Articles does not exist'), 404
 
+    app.logger.info('User {} Get article {}'.format(user, article))
     return jsonify(JsonUtil.serialize(article)), 200
 
 
@@ -104,7 +105,7 @@ def create_article(user):
     # Save it to elasticsearch
     ElasticSearchUtil.save_to_es(new_article)
 
-    app.logger.info('User {} Create article {}'.format(user, new_article))
+    app.logger.info('User {} Create article {} in List ID: {}'.format(user, new_article, list_id))
     return jsonify(JsonUtil.serialize(new_article)), 200
 
 
