@@ -6,7 +6,7 @@ from app.util import MongoUtil, JsonUtil
 @authorized_required
 def get_user_groups(user):
     """
-    @api {get} /user/groups Get all groups that user is in
+    @api {get} /user/groups Get user reading group
     @apiName Get user reading groups
     @apiGroup User
 
