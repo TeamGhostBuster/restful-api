@@ -58,3 +58,12 @@ apiError ArticleDoesNotExist The article does not exist
         "msg": "ObjectID is not valid"
     }
 """
+
+"""
+@apiDefine UserNotInGroup
+apiError UserNotInGroup The user is not in any group
+@apiErrorExample Error 204
+    {
+        "msg": "User is not in any group"
+    }
+"""
