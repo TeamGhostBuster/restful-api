@@ -227,8 +227,8 @@ def get_user_reading_lists(user):
 @authorized_required
 def create_group_list(user):
     """
-    @api {post} /user/list Create a reading list
-    @apiName Create a reading list
+    @api {post} /group/list Create a reading list in group
+    @apiName Create a reading list in group
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
