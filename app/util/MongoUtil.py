@@ -1,5 +1,6 @@
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
+from flask_mongoengine import ValidationError
 
 from app.api.article.model import Article
 from app.api.comment.model import Comment
@@ -118,8 +119,11 @@ def create_article(title, list_id, description=None, url=None, tags=None):
     if List.objects(id=ObjectId(list_id)).count() == 0:
         return None
 
-    # Create new article
-    new_article = Article(title=title, description=description, url=url, tags=tags).save()
+    try:
+        # Create new article
+        new_article = Article(title=title, description=description, url=url, tags=tags).save()
+    except ValidationError:
+        return None
 
     # Append article reference to the user's article lists
     List.objects(id=list_id).update_one(push__articles=new_article)
