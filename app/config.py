@@ -37,9 +37,9 @@ class DeployConfig(BaseConfig):
     DEBUG = True
 
     MONGODB_SETTINGS = {
-        'DB': 'raspberry',
-        'HOST': 'mongo',
-        'PORT': 27017
+        'HOST': 'mongodb://mongo,mongo1,mongo2/raspberry',
+        'PORT': 27017,
+        'replicaset': 'mongo-replica'
     }
 
     ELASTICSEARCH_SETTINGS = {
@@ -47,6 +47,7 @@ class DeployConfig(BaseConfig):
         'ELASTICSEARCH_AUTH': ('elastic', 'changeme'),
         'ELASTICSEARCH_PORT': 9200
     }
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
