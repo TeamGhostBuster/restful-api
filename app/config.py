@@ -1,3 +1,6 @@
+from pymongo.read_preferences import ReadPreference
+
+
 class BaseConfig(object):
     DEBUG = False
 
@@ -39,7 +42,8 @@ class DeployConfig(BaseConfig):
     MONGODB_SETTINGS = {
         'HOST': 'mongodb://mongo,mongo1,mongo2/raspberry',
         'PORT': 27017,
-        'replicaset': 'mongo-replica'
+        'replicaset': 'mongo-replica',
+        'READ_PREFERENCE': ReadPreference.SECONDARY
     }
 
     ELASTICSEARCH_SETTINGS = {
