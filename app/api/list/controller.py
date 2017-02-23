@@ -224,7 +224,7 @@ def get_user_reading_lists(user):
 
 
 @app.route('/group/list', methods=['POST'])
-@authorized_required
+@group_read_permission_required
 def create_group_list(user):
     """
     @api {post} /group/list Create a reading list in group
@@ -240,7 +240,7 @@ def create_group_list(user):
             "group_id": "834jlkkasd9"
         }
 
-    @apiUse UnauthorizedAccessError
+    @apiUse GroupAccessDenied
     """
     # Get list name from api parameter
     req = request.get_json()
@@ -252,13 +252,53 @@ def create_group_list(user):
         return 'Bad request', 400
 
     # Create a new list
-    new_list = MongoUtil.create_group_list(list_name, group_id)
+    new_list = MongoUtil.create_group_list(user, list_name, group_id)
     if new_list is None:
         return jsonify(msg='Bad Request.'), 200
 
     app.logger.info('User {} Create list'.format(group_id, new_list))
 
     return jsonify(JsonUtil.serialize(new_list)), 200
+
+
+@app.route('/group/<string:group_id>/lists', methods=['GET'])
+@authorized_required
+def get_group_lists(user, group_id):
+    """
+    @api {get} /group/:id/lists Get group reading lists
+    @apiName Get group reading lists
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiSuccess {String} id Group id
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "archived": "True",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse GroupDoesNotExist
+    @apiUse UnauthorizedAccessError
+    """
+    # Get group list
+    group = MongoUtil.get_group_lists(user, group_id)
+
+    if group is None:
+        return jsonify(msg='Group does not exist')
+
+    app.logger.info('User {} Get group ID: {} list'.format(user, group_id))
+    return jsonify(JsonUtil.serialize(group, only=('name', 'description', 'lists')))
 
 
 @app.route('/user/list/<string:list_id>/articles', methods=['POST'])
@@ -295,7 +335,7 @@ def add_article_to_user_list(user, list_id):
 
 
 @app.route('/group/list/<string:list_id>/articles', methods=['POST'])
-@authorized_required
+@group_read_permission_required
 def add_article_to_group_list(user, list_id):
     """
     @api {post} /group/list/:id/articles Add article to a group's list
@@ -310,7 +350,7 @@ def add_article_to_group_list(user, list_id):
             "article_id": "834jlkkasd9"
         }
 
-    @apiUse UnauthorizedAccessError
+    @apiUse GroupAccessDenied
     """
     # Get parameters
     req = request.get_json()

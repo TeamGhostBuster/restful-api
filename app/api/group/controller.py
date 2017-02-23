@@ -4,7 +4,7 @@ from app.util import JsonUtil
 
 
 @app.route('/group/<string:group_id>', methods=['GET'])
-@authorized_required
+@group_read_permission_required
 def get_group_info(user, group_id):
     """
     @api {get} /group/:id Get info of group
@@ -54,7 +54,7 @@ def get_group_info(user, group_id):
             ]
         }
 
-    @apiUse UnauthorizedAccessError
+    @apiUse GroupAccessDenied
     """
     reading_group = MongoUtil.find_group(group_id)
 

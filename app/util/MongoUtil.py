@@ -261,16 +261,18 @@ def add_group_member(group_id, member_id):
     return reading_group
 
 
-def create_group_list(list_name, group_id):
+def create_group_list(user, list_name, group_id):
+    # Check if user has permission
     # Create list
     new_list = List(name=list_name).save()
 
     # Append list reference to the group's list of lists
     try:
         Group.objects(id=ObjectId(group_id)).update_one(push__lists=new_list)
-        return new_list
     except DoesNotExist:
         return None
+
+    return new_list
 
 
 def get_user_groups(user):
@@ -280,3 +282,23 @@ def get_user_groups(user):
         return None
 
     return groups
+
+
+def get_group_lists(user, group_id):
+    try:
+        # Get group
+        group = Group.objects(id=ObjectId(group_id), members=user)
+    except DoesNotExist:
+        return None
+
+    return group
+
+
+def check_user_in_group(user, group_id):
+    try:
+        # Check if user belongs to the group
+        Group.objects.get(id=ObjectId(group_id), members=user)
+    except DoesNotExist:
+        return None
+
+    return 0
