@@ -2,6 +2,7 @@ from marshmallow import Schema, fields
 
 from app import db
 from app.api.article.model import Article, ArticleSchema
+from marshmallow import Schema, fields
 
 
 class List(db.Document):
@@ -13,7 +14,7 @@ class List(db.Document):
         return str(self)
 
     def __str__(self):
-        return 'id: {}, name:{}'.format(str(self.id), self.name)
+        return 'id: {}, name:{}, articles: {}'.format(str(self.id), self.name, self.articles)
 
 
 class ListSchema(Schema):
