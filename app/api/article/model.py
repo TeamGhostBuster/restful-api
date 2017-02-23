@@ -7,7 +7,7 @@ class Article(db.Document):
     title = db.StringField(required=True)
     description = db.StringField(required=True)
     url = db.URLField()
-    tags = db.ListField(db.StringField)
+    tags = db.ListField(db.StringField())
 
     def __repr__(self):
         return str(self)

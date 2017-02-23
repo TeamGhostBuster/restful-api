@@ -13,6 +13,6 @@ setup(
         "requests",
         "setuptools",
         'marshmallow',
-        'flask-cors'
+        'flask-cors', 'elasticsearch'
     ],
 )

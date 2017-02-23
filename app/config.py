@@ -7,6 +7,12 @@ class BaseConfig(object):
         'PORT': 27017
     }
 
+    ELASTICSEARCH_SETTINGS = {
+        'ELASTICSEARCH_HOST': ['localhost'],
+        'ELASTICSEARCH_AUTH': ('elastic', 'changeme'),
+        'ELASTICSEARCH_PORT': 9200
+    }
+
     # Oauth2 token setting
     SECRET_KEY = 'xxxxx'
     CONFIG = {
@@ -36,6 +42,11 @@ class DeployConfig(BaseConfig):
         'PORT': 27017
     }
 
+    ELASTICSEARCH_SETTINGS = {
+        'ELASTICSEARCH_HOST': 'elasticsearch',
+        'ELASTICSEARCH_AUTH': ('elastic', 'changeme'),
+        'ELASTICSEARCH_PORT': 9200
+    }
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True

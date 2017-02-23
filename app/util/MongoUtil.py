@@ -165,7 +165,7 @@ def add_tag(article_id, tag):
         return None
 
     # Add tag to article
-    Article.objects(id=ObjectId(article_id)).update_one(push__tags=tag)
+    Article.objects(id=article.id).update_one(push__tags=tag)
     article.reload()
 
     return article

@@ -1,6 +1,8 @@
 import os
 from logging import Formatter
 from logging.handlers import RotatingFileHandler
+from elasticsearch import Elasticsearch
+
 
 from flask import Flask
 from flask_mongoengine import MongoEngine
@@ -22,7 +24,16 @@ app.config.from_object(config[config_name])
 # initialize MongoEngine instance
 db = MongoEngine(app)
 
+# Cross origin request supports, like ajax
 CORS(app)
+
+# init the elasticsearch client
+es_config = app.config['ELASTICSEARCH_SETTINGS']
+es = Elasticsearch(
+    es_config['ELASTICSEARCH_HOST'],
+    http_auth=es_config['ELASTICSEARCH_AUTH'],
+    port=es_config['ELASTICSEARCH_PORT']
+)
 
 # Disable log file for now due to some wired permission error
 # file_handler = RotatingFileHandler('/var/log/info.log', maxBytes=10000, backupCount=1)

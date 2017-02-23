@@ -17,6 +17,8 @@ services:
             - mongo
             - mongo1
             - mongo2
+        external_links:
+            - elastic:elasticsearch
     mongo:
         image: mongo:3.4.1
         container_name: mongo

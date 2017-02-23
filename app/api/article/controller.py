@@ -1,5 +1,6 @@
 from app.util import JsonUtil
 from app.util import MongoUtil
+from app.util import ElasticSearchUtil
 from app.util.AuthUtil import *
 
 
@@ -38,8 +39,10 @@ def get_article(user, article_id):
 
     @apiUse UnauthorizedAccessError
     """
+    # Find article from the database
     article = MongoUtil.find_article(article_id)
 
+    # If the article does not exist
     if article is None:
         return jsonify(msg='Articles does not exist'), 404
 
@@ -92,10 +95,14 @@ def create_article(user):
     # Create article
     new_article = MongoUtil.create_article(title, list_id, description, url, tags)
 
+    # If the list does not exist
     if new_article is None:
         return jsonify({
             'msg': 'List does not exist'
         }), 400
+
+    # Save it to elasticsearch
+    ElasticSearchUtil.save_to_es(new_article)
 
     app.logger.info('User {} Create article {}'.format(user, new_article))
     return jsonify(JsonUtil.serialize(new_article)), 200
@@ -123,15 +130,21 @@ def add_tags(user, article_id):
     @apiUse UnauthorizedAccessError
     @apiUse ListDoesNotExist
     """
+    # Get tag from requrest
     req = request.get_json()
     tag = req.get('tag')
+
+    # Add tag
     article = MongoUtil.add_tag(article_id, tag)
 
+    # If the article does not exist
     if article is None:
         return jsonify({
             'msg': 'List does not exist'
         }), 400
 
-    app.logger.info('User {} Add tag {} to {}'.format(user, tag, article))
+    # Save it to elasticsearch
+    ElasticSearchUtil.save_to_es(article)
 
+    app.logger.info('User {} Add tag {} to {}'.format(user, tag, article))
     return jsonify(JsonUtil.serialize(article)), 200
