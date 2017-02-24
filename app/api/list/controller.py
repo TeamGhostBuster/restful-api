@@ -35,6 +35,8 @@ def get_articles_from_list(user, list_id):
 
     @apiUse UnauthorizedAccessError
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     reading_list = MongoUtil.find_list(list_id)
     # check for bad list
     if reading_list is None:
@@ -62,6 +64,8 @@ def create_list(user):
 
     @apiUse UnauthorizedAccessError
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Get list name from api parameter
     req = RequestUtil.get_request()
     list_name = req['name']
@@ -97,6 +101,8 @@ def delete_article(user, list_id, article_id):
     @apiUse ListDoesNotExist
     @apiUse ArticleDoesNotExist
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Delete the article from the list
     the_list = MongoUtil.delete_article(user, list_id, article_id)
 
@@ -140,6 +146,8 @@ def archive_list(user, list_id):
     @apiUse UnauthorizedAccessError
     @apiUse ListDoesNotExist
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     user = MongoUtil.archive_list(user, list_id)
 
     # If the list do
@@ -181,11 +189,15 @@ def retrieve_list(user, list_id):
     @apiUse UnauthorizedAccessError
     @apiUse ListDoesNotExist
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     user = MongoUtil.retrieve_list(user, list_id)
 
     # If the list do
     if user is None:
         return jsonify(msg='List does not exist'), 400
+
+    app.logger.info('User {} Retrieve List ID: {}'.format(user, list_id))
 
     return jsonify(JsonUtil.serialize(user))
 
@@ -219,7 +231,9 @@ def get_user_reading_lists(user):
 
     @apiUse UnauthorizedAccessError
     """
-    app.logger.info('User: {} Access: [{}]'.format(user, request.full_path))
+    app.logger.info('User: {} Access: {}'.format(user, request.full_path))
+    app.logger.info('User {} Get all reading lists'.format(user))
+
     return jsonify(JsonUtil.serialize(user)), 200
 
 
@@ -244,6 +258,8 @@ def create_group_list(user):
     @apiUse GroupAccessDenied
     """
     # Get list name from api parameter
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     req = RequestUtil.get_request()
     list_name = req['name']
     group_id = req['group_id']
@@ -292,14 +308,16 @@ def get_group_lists(user, group_id):
     @apiUse GroupDoesNotExist
     @apiUse UnauthorizedAccessError
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Get group list
     group = MongoUtil.get_group_lists(user, group_id)
 
     if group is None:
         return jsonify(msg='Group does not exist')
 
-    app.logger.info('User {} Get group ID: {} list'.format(user, group_id))
-    return jsonify(JsonUtil.serialize(group, only=('name', 'description', 'lists')))
+    app.logger.info('User {} Get group ID: {} lists'.format(user, group_id))
+    return jsonify(JsonUtil.serialize(group, only=('id', 'name', 'description', 'lists')))
 
 
 @app.route('/user/list/<string:list_id>/articles', methods=['POST'])
@@ -320,6 +338,8 @@ def add_article_to_user_list(user, list_id):
 
     @apiUse UnauthorizedAccessError
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Get parameters
     req = RequestUtil.get_request()
     article_id = req['article_id']
@@ -353,6 +373,8 @@ def add_article_to_group_list(user, list_id):
 
     @apiUse GroupAccessDenied
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Get parameters
     req = RequestUtil.get_request()
     article_id = req['article']

@@ -24,6 +24,8 @@ def share_list_to_group(user):
     @apiUse GroupAccessDenied
     @apiUse ListDoesNotExist
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Parse the request body
     req = RequestUtil.get_request()
     group_id = req.get('group_id', None)

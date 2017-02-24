@@ -30,6 +30,8 @@ def get_user_groups(user):
     @apiUse UnauthorizedAccessError
     @apiUse UserNotInGroup
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     groups = MongoUtil.get_user_groups(user)
 
     if groups is None:

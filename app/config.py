@@ -28,7 +28,8 @@ class BaseConfig(object):
     TEST_TOKEN = {
         'michaellam.lzc': 'michaellam.lzc@gmail.com',
         'zichun3': 'zichun3@ualberta.ca',
-        'sdlarsen': 'sdlarsen@ualberta.ca'
+        'sdlarsen': 'sdlarsen@ualberta.ca',
+        'hliu11': 'hliu11@ualberta.ca'
     }
 
 

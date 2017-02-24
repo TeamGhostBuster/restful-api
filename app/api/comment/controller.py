@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, request
 
 from app import app
 from app.util import MongoUtil, JsonUtil, RequestUtil
@@ -28,6 +28,8 @@ def add_comment(user, article_id):
     @apiUse ArticleDoesNotExist
     """
     # Validate the article id
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     if not validate_id(article_id):
         return jsonify(msg='ObjectID is not valid'), 400
 

@@ -53,8 +53,8 @@ def get_article(user, article_id):
 @authorized_required
 def create_article(user):
     """
-    @api {post} /user/article/ Create a article
-    @apiName Create a article
+    @api {post} /user/article/ Create a article for user
+    @apiName Create a article for user
     @apiGroup Article
 
     @apiUse AuthorizationTokenHeader
@@ -109,6 +109,58 @@ def create_article(user):
     return jsonify(JsonUtil.serialize(new_article)), 200
 
 
+@app.route('/group/article', methods=['POST'])
+@group_read_permission_required
+def create_article_in_group(user):
+    """
+    @api {post} /group/article/ Create a article in group
+    @apiName Create a article in group
+    @apiGroup Article
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} list_id The list id.
+    @apiParam {String} group_id The group id.
+    @apiParam {String} title The article title.
+    @apiParam {String} description The description.
+    @apiParam {String} [url] The url to the article.
+    @apiParam {Json} [tags] The user custom tags.
+    @apiParamExample {json} Request (Example):
+        {
+            "title": "God know what it is",
+            "list_id": "aldkfjdaslkfjl",
+            "group_id": "aldkfja"
+            "description": "I don't know",
+            "url": "https://www.gooel.com/something",
+            "tags": ["tag1", "tag2", "tag3"]
+        }
+
+    @apiSuccess {String} Message Success message.
+
+    @apiUse GroupAccessDenied
+    @apiUse ListDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    # Parse request, parse empty string and
+    req = RequestUtil.get_request()
+
+    title = req.get('title')
+    list_id = req.get('list_id')
+    group_id = req.get('group_id')
+    description = req.get('description')
+    url = req.get('url', None)
+    tags = req.get('tags', None)
+
+    # Create new article
+    new_article = MongoUtil.create_article_in_group(title, list_id, group_id,
+                                                    description, url, tags)
+
+    app.logger.info('User {} Create article {} in List ID: {} in Group ID: {}'.format(
+        user, new_article, list_id, group_id))
+    return jsonify(JsonUtil.serialize(new_article)), 200
+
+
 @app.route('/user/article/<string:article_id>/tag', methods=['POST'])
 @authorized_required
 def add_tags(user, article_id):
@@ -132,6 +184,8 @@ def add_tags(user, article_id):
     @apiUse ListDoesNotExist
     """
     # Get tag from requrest
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     req = RequestUtil.get_request()
     tag = req.get('tag')
 

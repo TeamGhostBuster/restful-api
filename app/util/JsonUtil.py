@@ -35,5 +35,5 @@ def serialize(obj, only=tuple(), exclude=tuple()):
         return dict(schema.dump(obj).data)
 
     elif isinstance(obj, Vote):
-        schema = VoteSchema()
+        schema = VoteSchema(only=only, exclude=exclude)
         return dict(schema.dump(obj).data)

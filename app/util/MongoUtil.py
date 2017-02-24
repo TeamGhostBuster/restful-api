@@ -109,7 +109,7 @@ def create_list(list_name, user):
     return new_list
 
 
-def create_article(title, list_id, description=None, url=None, tags=None):
+def create_article(title, list_id, description, url=None, tags=None):
     # Check if list exists
     if List.objects(id=ObjectId(list_id)).count() == 0:
         return None
@@ -122,6 +122,21 @@ def create_article(title, list_id, description=None, url=None, tags=None):
 
     # Append article reference to the user's article lists
     List.objects(id=list_id).update_one(push__articles=new_article)
+
+    return new_article
+
+
+def create_article_in_group(title, list_id, group_id, description, url=None, tags=None):
+    try:
+        # Check if the list exist
+        the_list = List.objects.get(id=ObjectId(list_id))
+        # Check if the list belongs to the group
+        the_group = Group.objects.get(id=ObjectId(group_id), lists=the_list)
+    except DoesNotExist:
+        return None
+
+    # create new article
+    new_article = create_article(title, list_id, description, url, tags)
 
     return new_article
 
@@ -280,7 +295,7 @@ def get_user_groups(user):
 def get_group_lists(user, group_id):
     try:
         # Get group
-        group = Group.objects(id=ObjectId(group_id), members=user)
+        group = Group.objects.get(id=ObjectId(group_id), members=user)
     except DoesNotExist:
         return None
 
