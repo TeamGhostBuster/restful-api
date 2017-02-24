@@ -46,12 +46,11 @@ def archive_list(user, list_id):
     try:
         # Get the list
         archived_list = List.objects.get(id=ObjectId(list_id))
+        User.objects.get(id=user.id, lists=archived_list)
     except DoesNotExist:
         return None
 
     # Check if user has permission or not
-    if archive_list not in user.lists:
-        return None
 
     # Mark it as archived
     List.objects(id=archived_list.id).update_one(archived=True)
