@@ -4,7 +4,7 @@ from app.util import JsonUtil
 
 
 @app.route('/group/<string:group_id>', methods=['GET'])
-@authorized_required
+@group_read_permission_required
 def get_group_info(user, group_id):
     """
     @api {get} /group/:id Get info of group
@@ -54,7 +54,7 @@ def get_group_info(user, group_id):
             ]
         }
 
-    @apiUse UnauthorizedAccessError
+    @apiUse GroupAccessDenied
     """
     reading_group = MongoUtil.find_group(group_id)
 
@@ -82,9 +82,9 @@ def create_group(user):
             "Provider-Name": "Google"
         }
 
-    @apiParam {String} name: group_name
-    @apiParam {String} members: comma-separated string of member IDs
-    @apiParam {String} description: description
+    @apiParam {String} name Group name
+    @apiParam {String} members comma-separated string of member IDs
+    @apiParam {String} [description] description
     @apiParamExample {json} Request (Example)
         {
             "name": "CMPUT495 Seminar",
@@ -96,10 +96,14 @@ def create_group(user):
     """
     # Get group name + group parameters from api
     req = request.get_json()
-    group_name = req['name']
+    group_name = req.get('name')
     moderator = user
-    members = req.get('members').split(',')
-    description = req.get('description')
+    members = req.get('members', None)
+
+    # Only split if it is not None
+    if members is not None:
+        members = members.split(',')
+    description = req.get('description', None)
 
     # Check for missing parameters
     if group_name is None:

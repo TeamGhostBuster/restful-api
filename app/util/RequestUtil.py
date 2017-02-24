@@ -1,12 +1,11 @@
 import requests
-from bson.objectid import InvalidId
+
 from flask import request
 from bson.objectid import ObjectId, InvalidId
 
 from app import app
 from app.config import *
-from app.util.MongoUtil import *
-import os
+from app.util import MongoUtil
 
 
 def get_auth_info():
@@ -26,7 +25,7 @@ def get_auth_info():
     if access_token is not None:
         # For development purpose only
         if access_token in app.config['TEST_TOKEN'].keys():
-            user = find_user(app.config['TEST_TOKEN'][access_token])
+            user = MongoUtil.find_user(app.config['TEST_TOKEN'][access_token])
         else:
             # Check that the Access Token is valid.
             url = ('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
@@ -37,13 +36,13 @@ def get_auth_info():
             elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
                 return None
 
-            user = find_user(result['email'])
+            user = MongoUtil.find_user(result['email'])
 
     if user is None:
         # if user does not exist, create a new user instead
         app.logger.info('Create User: {}'.format(user))
         first_name, last_name = get_user_profile(access_token)
-        user = create_user(result['email'], first_name, last_name)
+        user = MongoUtil.create_user(result['email'], first_name, last_name)
 
     return user
 
@@ -68,3 +67,18 @@ def validate_id(objectid):
         return False
 
     return True
+
+
+def check_group_read_permission(user):
+    # Parse request
+    req = request.get_json()
+    group_id = req.get('group_id', None)
+    name = req.get('name', None)
+
+    if group_id is None or name is None:
+        return None
+
+    if MongoUtil.check_user_in_group(user, group_id) is None:
+        return None
+
+    return 0

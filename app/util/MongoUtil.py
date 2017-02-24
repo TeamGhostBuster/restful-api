@@ -1,5 +1,6 @@
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
+from flask_mongoengine import ValidationError
 
 from app.api.article.model import Article
 from app.api.comment.model import Comment
@@ -118,8 +119,11 @@ def create_article(title, list_id, description=None, url=None, tags=None):
     if List.objects(id=ObjectId(list_id)).count() == 0:
         return None
 
-    # Create new article
-    new_article = Article(title=title, description=description, url=url, tags=tags).save()
+    try:
+        # Create new article
+        new_article = Article(title=title, description=description, url=url, tags=tags).save()
+    except ValidationError:
+        return None
 
     # Append article reference to the user's article lists
     List.objects(id=list_id).update_one(push__articles=new_article)
@@ -257,13 +261,44 @@ def add_group_member(group_id, member_id):
     return reading_group
 
 
-def create_group_list(list_name, group_id):
+def create_group_list(user, list_name, group_id):
+    # Check if user has permission
     # Create list
     new_list = List(name=list_name).save()
 
     # Append list reference to the group's list of lists
     try:
         Group.objects(id=ObjectId(group_id)).update_one(push__lists=new_list)
-        return new_list
     except DoesNotExist:
         return None
+
+    return new_list
+
+
+def get_user_groups(user):
+    groups = Group.objects(members=user)
+
+    if Group.objects(members=user).count() == 0:
+        return None
+
+    return groups
+
+
+def get_group_lists(user, group_id):
+    try:
+        # Get group
+        group = Group.objects(id=ObjectId(group_id), members=user)
+    except DoesNotExist:
+        return None
+
+    return group
+
+
+def check_user_in_group(user, group_id):
+    try:
+        # Check if user belongs to the group
+        Group.objects.get(id=ObjectId(group_id), members=user)
+    except DoesNotExist:
+        return None
+
+    return 0

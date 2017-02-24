@@ -24,6 +24,15 @@ from .comment import model as comment_model
 """
 
 """
+@apiDefine GroupAccessDenied
+@apiError GroupAccessDenied User does not have accesss to the group
+@apiErrorExample Error 401
+    {
+        "msg": "User does not have read permission"
+    }
+"""
+
+"""
 @apiDefine UnauthorizedAccessError
 @apiError UnauthorizedAccessError User's access token is not valid
 @apiErrorExample Error 401
@@ -56,5 +65,23 @@ apiError ArticleDoesNotExist The article does not exist
 @apiErrorExample Error 400
     {
         "msg": "ObjectID is not valid"
+    }
+"""
+
+"""
+@apiDefine UserNotInGroup
+apiError UserNotInGroup The user is not in any group
+@apiErrorExample Error 204
+    {
+        "msg": "User is not in any group"
+    }
+"""
+
+"""
+@apiDefine GroupDoesNotExist
+@apiError GroupDoesNotExist The group does not exist
+@apiErrorExample Error 204
+    {
+        "msg": "Group does not exist"
     }
 """
