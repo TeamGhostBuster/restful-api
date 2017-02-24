@@ -1,16 +1,15 @@
+from copy import deepcopy
+
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
 from flask_mongoengine import ValidationError
 
 from app.api.article.model import Article
 from app.api.comment.model import Comment
+from app.api.group.model import Group
 from app.api.list.model import List
 from app.api.user.model import User
-from app.api.comment.model import Comment
-from app.api.group.model import Group
-
-from copy import deepcopy
-
+from app.api.vote.model import Vote
 
 
 def find_user(email):
@@ -76,6 +75,7 @@ def retrieve_list(user, list_id):
     user.reload()
 
     return user
+
 
 # def get_user_all_lists(user):
 #     # user = User.objects.get(id=user.id, lists__)
@@ -207,7 +207,6 @@ def add_comment(user, article_id, comment, public=True):
 
 
 def create_group(group_name, moderator, members=None, description=None):
-
     # Create group
     new_group = Group(name=group_name, moderator=moderator, description=description).save()
 
@@ -266,7 +265,6 @@ def create_group_list(user, list_name, group_id):
         Group.objects(id=ObjectId(group_id)).update_one(push__lists=new_list)
     except DoesNotExist:
         return None
-
     return new_list
 
 
@@ -313,3 +311,46 @@ def share_list_to_group(user, list_id, group_id):
     duplicate_list.save()
     Group.objects(id=ObjectId(group_id)).update_one(push__lists=duplicate_list)
     return duplicate_list
+
+
+def create_vote_object(list_id, article_id):
+    try:
+        reading_list = find_list(list_id)
+        article = find_article(article_id)
+    except DoesNotExist:
+        return None
+
+    new_vote_object = Vote(article=article, list=reading_list).save()
+    return new_vote_object
+
+
+def find_vote(vote_id):
+    try:
+        vote_object = Vote.objects.get(id=ObjectId(vote_id))
+    except DoesNotExist:
+        return None
+    return vote_object
+
+
+def add_vote(vote_id, upvote, voter):
+    # Find the vote object
+    try:
+        vote_object = find_vote(vote_id)
+    except DoesNotExist:
+        return None
+
+    # Add record of user voting/check if user has already voted
+    try:
+        Vote.objects.get(id=ObjectId(vote_id), voter_list=voter)
+    except DoesNotExist:
+        Vote.objects(id=ObjectId(vote_id)).update_one(push__voter_list=voter)
+
+        if upvote:
+            # Increment in up vote
+            Vote.objects(id=ObjectId(vote_id)).update_one(inc__vote_count=1)
+        else:
+            # decrement if down vote
+            Vote.objects(id=ObjectId(vote_id)).update_one(dec__vote_count=1)
+
+    vote_object.reload()
+    return vote_object

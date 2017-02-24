@@ -9,6 +9,8 @@ from .list import model as list_model
 from .share import controller as share_api
 from .user import controller as user_api
 from .user import model as user_model
+from .vote import controller as vote_api
+from .vote import model as vote_model
 
 # APIDOC Inherit Doc
 
