@@ -49,8 +49,6 @@ def archive_list(user, list_id):
     except DoesNotExist:
         return None
 
-    # Check if user has permission or not
-
     # Mark it as archived
     List.objects(id=archived_list.id).update_one(archived=True)
 
@@ -62,11 +60,8 @@ def archive_list(user, list_id):
 def retrieve_list(user, list_id):
     try:
         retrieved_list = List.objects.get(id=ObjectId(list_id))
+        User.objects.get(id=user.id, lists=retrieved_list)
     except DoesNotExist:
-        return None
-
-    # Check if user has permission or not
-    if archive_list not in user.list:
         return None
 
     # Mark it as not archived
@@ -75,6 +70,35 @@ def retrieve_list(user, list_id):
     user.reload()
 
     return user
+
+
+def archive_group_list(group_id, list_id):
+    try:
+        # Check if list exists
+        archived_list = List.objects.get(id=ObjectId(list_id))
+        # Check if the list belongs to the group
+        group = Group.objects.get(id=ObjectId(group_id), lists=archived_list)
+    except DoesNotExist:
+        return None
+
+    List.objects(id=archived_list.id).update_one(archived=True)
+
+    return group
+
+
+def retrieve_group_list(group_id, list_id):
+    try:
+        # Check if list exists
+        retrieved_list = List.objects.get(id=ObjectId(list_id))
+        # Check if the list belongs to the group
+        group = Group.objects.get(id=ObjectId(group_id), lists=retrieved_list)
+    except DoesNotExist:
+        return None
+
+    List.objects(id=retrieved_list.id).update_one(archived=False)
+
+    return group
+
 
 
 # def get_user_all_lists(user):

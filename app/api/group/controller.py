@@ -55,6 +55,8 @@ def get_group_info(user, group_id):
 
     @apiUse GroupAccessDenied
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     reading_group = MongoUtil.find_group(group_id)
 
     # Check for bad group
@@ -93,6 +95,8 @@ def create_group(user):
 
     @apiUse UnauthorizedAccessError
     """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
     # Get group name + group parameters from api
     req = RequestUtil.get_request()
     group_name = req.get('name')
@@ -151,3 +155,118 @@ def add_group_member(user, group_id):
     app.logger.info('User {} add member {} to {}'.format(user, member_id, reading_group))
 
     return jsonify(JsonUtil.serialize(reading_group)), 200
+
+
+@app.route('/group/list/<string:list_id>/archive', methods=['DELETE'])
+@group_read_permission_required
+def archive_group_list(user, list_id):
+    """
+    @api {delete} /group/list/:id/archive Archive a group list
+    @apiName Archive a group list
+    @apiGroup Group
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} id The list id.
+    @apiParam {String} group_id The group id.
+    @apiParamExample {json} Request (Example)
+        {
+            "group_id": "adlfkjalsk"
+        }
+
+    @apiSuccess {String} id Group id
+    @apiSuccess {String} name Group name
+    @apiSuccess {String} description Group description
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "name": "Seminar",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "archived": "True",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse GroupAccessDenied
+    @apiUse ListDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    # Parse request
+    req = RequestUtil.get_request()
+    group_id = req.get('group_id')
+
+    # Archive the list in the group
+    group = MongoUtil.archive_group_list(group_id, list_id)
+
+    # If the user does not have permission or list does not exist
+    if group is None:
+        return jsonify(msg='List does not exist'), 404
+
+    app.logger.info('User {} Achieve List ID: {} in Group '.format(user, list_id, group))
+    return jsonify(JsonUtil.serialize(group, only=('id', 'name', 'description', 'lists')))
+
+
+@app.route('/group/list/<string:list_id>/retrieve', methods=['PUT'])
+@group_read_permission_required
+def retrieve_group_list(user, list_id):
+    """
+    @api {delete} /group/list/:id/retrieve Retrieve a group list
+    @apiName Retrieve a group list
+    @apiGroup Group
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} id The list id.
+    @apiParam {String} group_id The group id.
+    @apiParamExample {json} Request (Example)
+        {
+            "group_id": "adlfkjalsk"
+        }
+
+    @apiSuccess {String} id Group id
+    @apiSuccess {String} name Group name
+    @apiSuccess {String} description Group description
+    @apiSuccess {Object[]} lists Lists data
+    @apiSuccess {String} lists.id List id
+    @apiSuccess {Boolean} lists.archived Archived list or not
+    @apiSuccess {String} lists.name List name
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "name": "dasjflk",
+            "description": "adlskfsa",
+            "lists": [
+                {
+                    "id": "adlfajdls",
+                    "archived": "False",
+                    "name": "Process"
+                }
+            ]
+        }
+
+    @apiUse GroupAccessDenied
+    @apiUse ListDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    # Parse request
+    req = RequestUtil.get_request()
+    group_id = req.get('group_id')
+
+    # Retrieve the list in the group
+    group = MongoUtil.retrieve_group_list(group_id, list_id)
+
+    # If the user does not have permission or list does not exist
+    if group is None:
+        return jsonify(msg='List does not exist'), 404
+
+    app.logger.info('User {} Retrieve List ID: {} in Group '.format(user, list_id, group))
+    return jsonify(JsonUtil.serialize(group, only=('id', 'name', 'description', 'lists')))

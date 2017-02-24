@@ -24,7 +24,7 @@ class GroupSchema(Schema):
     name = fields.String()
     moderator = fields.Nested(UserSchema, only=('id', 'first_name', 'last_name'))
     members = fields.Nested(UserSchema, many=True, only=('id', 'first_name', 'last_name'))
-    lists = fields.Nested(ListSchema, many=True, only=('id', 'name'))
+    lists = fields.Nested(ListSchema, many=True, only=('id', 'name', 'archived'))
     description = fields.String()
 
     class Meta:

@@ -289,6 +289,8 @@ def get_group_lists(user, group_id):
     @apiUse AuthorizationTokenHeader
 
     @apiSuccess {String} id Group id
+    @apiSuccess {String} name Group name
+    @apiSuccess {String} description Group description
     @apiSuccess {Object[]} lists Lists data
     @apiSuccess {String} lists.id List id
     @apiSuccess {Boolean} lists.archived Archived list or not
@@ -296,6 +298,8 @@ def get_group_lists(user, group_id):
     @apiSuccessExample {json} Response (Example):
         {
             "id": "31ladsjfl",
+            "name": "Seminar",
+            "description": "adsfadsljflka",
             "lists": [
                 {
                     "id": "adlfajdls",
