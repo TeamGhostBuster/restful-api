@@ -1,5 +1,5 @@
-from app.util.AuthUtil import *
 from app.util import MongoUtil, JsonUtil
+from app.util.AuthUtil import *
 
 
 @app.route('/user/groups', methods=['GET'])

@@ -1,12 +1,14 @@
+from copy import deepcopy
+
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
 from flask_mongoengine import ValidationError
 
 from app.api.article.model import Article
-from app.api.list.model import List
-from app.api.user.model import User
 from app.api.comment.model import Comment
 from app.api.group.model import Group
+from app.api.list.model import List
+from app.api.user.model import User
 from app.api.vote.model import Vote
 
 
@@ -43,12 +45,11 @@ def archive_list(user, list_id):
     try:
         # Get the list
         archived_list = List.objects.get(id=ObjectId(list_id))
+        User.objects.get(id=user.id, lists=archived_list)
     except DoesNotExist:
         return None
 
     # Check if user has permission or not
-    if archive_list not in user.list:
-        return None
 
     # Mark it as archived
     List.objects(id=archived_list.id).update_one(archived=True)
@@ -75,6 +76,7 @@ def retrieve_list(user, list_id):
 
     return user
 
+
 # def get_user_all_lists(user):
 #     # user = User.objects.get(id=user.id, lists__)
 #     pipeline = [
@@ -95,13 +97,6 @@ def retrieve_list(user, list_id):
 #                     'lists': {'$push': '$lists'}}}
 #     ]
 #     pass
-
-
-def get_article_from_list(list):
-    articles = list.articles
-
-    for i in articles:
-        print(i.title)
 
 
 def create_list(list_name, user):
@@ -212,7 +207,6 @@ def add_comment(user, article_id, comment, public=True):
 
 
 def create_group(group_name, moderator, members=None, description=None):
-
     # Create group
     new_group = Group(name=group_name, moderator=moderator, description=description).save()
 
@@ -301,6 +295,22 @@ def check_user_in_group(user, group_id):
         return None
 
     return 0
+
+
+def share_list_to_group(user, list_id, group_id):
+    try:
+        # Check if the list exist
+        the_list = List.objects.get(id=ObjectId(list_id))
+        # Check if user has permission to the list or not
+        User.objects.get(id=user.id, lists=the_list)
+    except DoesNotExist:
+        return None
+
+    duplicate_list = deepcopy(the_list)
+    duplicate_list.id = None
+    duplicate_list.save()
+    Group.objects(id=ObjectId(group_id)).update_one(push__lists=duplicate_list)
+    return duplicate_list
 
 
 def create_vote_object(list_id, article_id):

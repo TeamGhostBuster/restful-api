@@ -71,14 +71,21 @@ def validate_id(objectid):
 
 def check_group_read_permission(user):
     # Parse request
-    req = request.get_json()
+    req = get_request()
     group_id = req.get('group_id', None)
-    name = req.get('name', None)
 
-    if group_id is None or name is None:
+    if group_id is None:
         return None
 
     if MongoUtil.check_user_in_group(user, group_id) is None:
         return None
 
-    return 0
+    return user
+
+
+def get_request():
+    """
+    Parse request, convert empty string or 'null' into None type in python
+    :return:
+    """
+    return {k: v if v != '' and v != 'null' else None for k, v in request.get_json().items()}

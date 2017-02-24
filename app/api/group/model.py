@@ -1,7 +1,8 @@
+from marshmallow import Schema, fields
+
 from app import db
 from app.api.list.model import List, ListSchema
 from app.api.user.model import User, UserSchema
-from marshmallow import Schema, fields
 
 
 class Group(db.Document):
