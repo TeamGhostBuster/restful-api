@@ -1,6 +1,5 @@
-from app.util import JsonUtil
-from app.util import MongoUtil
 from app.util import ElasticSearchUtil
+from app.util import JsonUtil, RequestUtil
 from app.util.AuthUtil import *
 
 
@@ -79,13 +78,14 @@ def create_article(user):
     @apiUse UnauthorizedAccessError
     @apiUse ListDoesNotExist
     """
-    # Parse request
-    req = request.get_json()
+    # Parse request, parse empty string and
+    req = RequestUtil.get_request()
+
     title = req.get('title')
     list_id = req.get('list_id')
     description = req.get('description')
-    url = req.get('url')
-    tags = req.get('tags')
+    url = req.get('url', None)
+    tags = req.get('tags', None)
 
     # Validate request
     if not 'title' or not 'list_id':
@@ -132,7 +132,7 @@ def add_tags(user, article_id):
     @apiUse ListDoesNotExist
     """
     # Get tag from requrest
-    req = request.get_json()
+    req = RequestUtil.get_request()
     tag = req.get('tag')
 
     # Add tag

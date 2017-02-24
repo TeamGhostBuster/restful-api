@@ -50,7 +50,7 @@ def archive_list(user, list_id):
         return None
 
     # Check if user has permission or not
-    if archive_list not in user.list:
+    if archive_list not in user.lists:
         return None
 
     # Mark it as archived
@@ -98,13 +98,6 @@ def retrieve_list(user, list_id):
 #                     'lists': {'$push': '$lists'}}}
 #     ]
 #     pass
-
-
-def get_article_from_list(list):
-    articles = list.articles
-
-    for i in articles:
-        print(i.title)
 
 
 def create_list(list_name, user):
@@ -320,5 +313,4 @@ def share_list_to_group(user, list_id, group_id):
     duplicate_list.id = None
     duplicate_list.save()
     Group.objects(id=ObjectId(group_id)).update_one(push__lists=duplicate_list)
-    print(duplicate_list)
     return duplicate_list

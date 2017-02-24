@@ -1,7 +1,7 @@
-from app.util import MongoUtil, JsonUtil
-from app.util.AuthUtil import *
-from app.util import MongoUtil
 from app.util import JsonUtil
+from app.util import MongoUtil
+from app.util import RequestUtil
+from app.util.AuthUtil import *
 
 
 @app.route('/user/list/<string:list_id>', methods=['GET'])
@@ -63,7 +63,7 @@ def create_list(user):
     @apiUse UnauthorizedAccessError
     """
     # Get list name from api parameter
-    req = request.get_json()
+    req = RequestUtil.get_request()
     list_name = req['name']
 
     # If missing parameter
@@ -243,7 +243,7 @@ def create_group_list(user):
     @apiUse GroupAccessDenied
     """
     # Get list name from api parameter
-    req = request.get_json()
+    req = RequestUtil.get_request()
     list_name = req['name']
     group_id = req['group_id']
 
@@ -320,7 +320,7 @@ def add_article_to_user_list(user, list_id):
     @apiUse UnauthorizedAccessError
     """
     # Get parameters
-    req = request.get_json()
+    req = RequestUtil.get_request()
     article_id = req['article_id']
 
     reading_list = MongoUtil.add_article_to_list(list_id, article_id)
@@ -353,7 +353,7 @@ def add_article_to_group_list(user, list_id):
     @apiUse GroupAccessDenied
     """
     # Get parameters
-    req = request.get_json()
+    req = RequestUtil.get_request()
     article_id = req['article']
 
     reading_list = MongoUtil.add_article_to_list(list_id, article_id)

@@ -1,7 +1,7 @@
-from flask import request, jsonify
+from flask import jsonify
 
 from app import app
-from app.util import MongoUtil, JsonUtil
+from app.util import MongoUtil, JsonUtil, RequestUtil
 from app.util.AuthUtil import authorized_required, validate_id
 
 
@@ -32,7 +32,7 @@ def add_comment(user, article_id):
         return jsonify(msg='ObjectID is not valid'), 400
 
     # Get request body
-    req = request.get_json()
+    req = RequestUtil.get_request()
     comment = req.get('comment')
     public = req.get('public')
 

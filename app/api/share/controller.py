@@ -1,8 +1,6 @@
-from app import app
-
-from app.util.AuthUtil import *
 from app.util import JsonUtil
-from flask import request
+from app.util import RequestUtil
+from app.util.AuthUtil import *
 
 
 @app.route('/share/list', methods=['POST'])
@@ -27,7 +25,7 @@ def share_list_to_group(user):
     @apiUse ListDoesNotExist
     """
     # Parse the request body
-    req = request.get_json()
+    req = RequestUtil.get_request()
     group_id = req.get('group_id', None)
     list_id = req.get('list_id', None)
 

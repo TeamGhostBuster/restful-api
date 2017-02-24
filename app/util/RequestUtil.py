@@ -71,7 +71,7 @@ def validate_id(objectid):
 
 def check_group_read_permission(user):
     # Parse request
-    req = request.get_json()
+    req = get_request()
     group_id = req.get('group_id', None)
 
     if group_id is None:
@@ -81,3 +81,11 @@ def check_group_read_permission(user):
         return None
 
     return user
+
+
+def get_request():
+    """
+    Parse request, convert empty string or 'null' into None type in python
+    :return:
+    """
+    return {k: v if v != '' and v != 'null' else None for k, v in request.get_json().items()}

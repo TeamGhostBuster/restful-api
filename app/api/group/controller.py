@@ -1,6 +1,5 @@
-from app.util import MongoUtil
+from app.util import JsonUtil, RequestUtil
 from app.util.AuthUtil import *
-from app.util import JsonUtil
 
 
 @app.route('/group/<string:group_id>', methods=['GET'])
@@ -83,7 +82,7 @@ def create_group(user):
         }
 
     @apiParam {String} name Group name
-    @apiParam {String} members comma-separated string of member IDs
+    @apiParam {String} [members[ comma-separated string of member IDs
     @apiParam {String} [description] description
     @apiParamExample {json} Request (Example)
         {
@@ -95,7 +94,7 @@ def create_group(user):
     @apiUse UnauthorizedAccessError
     """
     # Get group name + group parameters from api
-    req = request.get_json()
+    req = RequestUtil.get_request()
     group_name = req.get('name')
     moderator = user
     members = req.get('members', None)
@@ -119,7 +118,7 @@ def create_group(user):
 @app.route('/group/<string:group_id>/members', methods=['POST'])
 @authorized_required
 def add_group_member(user, group_id):
-    req = request.get_json()
+    req = RequestUtil.get_request()
     member_id = req.get('member')
     reading_group = MongoUtil.add_group_member(group_id, member_id)
 
