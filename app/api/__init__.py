@@ -3,6 +3,7 @@ from .list import controller as list_api
 from .user import controller as user_api
 from .group import controller as group_api
 from .comment import controller as comment_api
+from .share import controller as share_api
 from .article import model as article_model
 from .list import model as list_model
 from .user import model as user_model

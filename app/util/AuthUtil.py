@@ -28,6 +28,7 @@ def group_read_permission_required(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        user = get_auth_info()
         user = check_group_read_permission(get_auth_info())
         if user is None:
             return jsonify({'msg': 'User does not have group read permission'}), 401

@@ -9,6 +9,9 @@ from app.api.user.model import User
 from app.api.comment.model import Comment
 from app.api.group.model import Group
 
+from copy import deepcopy
+
+
 
 def find_user(email):
     # Find the existed user by email
@@ -302,3 +305,20 @@ def check_user_in_group(user, group_id):
         return None
 
     return 0
+
+
+def share_list_to_group(user, list_id, group_id):
+    try:
+        # Check if the list exist
+        the_list = List.objects.get(id=ObjectId(list_id))
+        # Check if user has permission to the list or not
+        User.objects.get(id=user.id, lists=the_list)
+    except DoesNotExist:
+        return None
+
+    duplicate_list = deepcopy(the_list)
+    duplicate_list.id = None
+    duplicate_list.save()
+    Group.objects(id=ObjectId(group_id)).update_one(push__lists=duplicate_list)
+    print(duplicate_list)
+    return duplicate_list
