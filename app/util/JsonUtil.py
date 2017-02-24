@@ -3,6 +3,7 @@ from app.api.comment.model import Comment, CommentSchema
 from app.api.list.model import List, ListSchema
 from app.api.user.model import User, UserSchema
 from app.api.group.model import Group, GroupSchema
+from app.api.vote.model import Vote, VoteSchema
 
 
 def serialize(obj, only=tuple(), exclude=tuple()):
@@ -31,4 +32,8 @@ def serialize(obj, only=tuple(), exclude=tuple()):
 
     elif isinstance(obj, Group):
         schema = GroupSchema(only=only, exclude=exclude)
+        return dict(schema.dump(obj).data)
+
+    elif isinstance(obj, Vote):
+        schema = VoteSchema()
         return dict(schema.dump(obj).data)

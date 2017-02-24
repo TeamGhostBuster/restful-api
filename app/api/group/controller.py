@@ -15,20 +15,20 @@ def get_group_info(user, group_id):
 
     @apiParam {String} id Group unique ID.
 
-    @apiSuccess {String} Group id.
-    @apiSuccess {String} Group name.
-    @apiSuccess {String} Group description
-    @apiSuccess {Object[]} Group moderator.
-        @apiSuccess {String} Group moderator id.
-        @apiSuccess {String} Group moderator first name.
-        @apiSuccess {String} Group moderator last name.
-    @apiSuccess {Object[]} Group members.
-        @apiSuccess {String} Group member id.
-        @apiSuccess {String} Group member first name.
-        @apiSuccess {String} Group member last name.
-    @apiSuccess {Object[]} Group lists.
-        @apiSuccess {String} List id.
-        @apiSuccess {String} List name.
+    @apiSuccess {String} id The id of the group.
+    @apiSuccess {String} name The group's name.
+    @apiSuccess {String} description A short description of the group.
+    @apiSuccess {Object[]} moderator The Group moderator.
+    @apiSuccess {String} moderator.id The moderator's id.
+    @apiSuccess {String} moderator.first_name The moderator's first name.
+    @apiSuccess {String} moderator.last_name the moderator's last name.
+    @apiSuccess {Object[]} members Group members' data.
+    @apiSuccess {String} members.id The member's id.
+    @apiSuccess {String} members.first_name The member's first name.
+    @apiSuccess {String} members.last_name The member's last name.
+    @apiSuccess {Object[]} lists The group's lists.
+    @apiSuccess {String} lists.id The list's id.
+    @apiSuccess {String} lists.name The list's name.
     @apiSuccessExample {json} Response (Example):
         {
             "id": "31ladsjfl",
@@ -36,13 +36,13 @@ def get_group_info(user, group_id):
             "description": "Reading Group for CMPUT 391 Seminar."
             "moderator": {
                     "id": "adlfajdls",
-                    "first_name": "Jesus",
-                    "last_name": "Sanchez
+                    "first_name": "Ricardo",
+                    "last_name": "Sanchez"
             },
             "members": [
                 {
                     "id": "adlfajdls",
-                    "first_name": "Jesus",
+                    "first_name": "Ricardo",
                     "last_name": "Sanchez"
                 }
             ],
@@ -119,8 +119,30 @@ def create_group(user):
 @app.route('/group/<string:group_id>/members', methods=['POST'])
 @authorized_required
 def add_group_member(user, group_id):
+    """
+    @api {post} /group/:id/members Add a new member to reading group
+    @apiName Add a new member to a reading groups
+    @apiGroup Group
+
+    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
+    @apiHeader {String} Provider-Name Oauth2 provider name.
+    @apiHeaderExample {json} Header (Example):
+        {
+            "Access-Token": "12xsdklajlkadsf",
+            "Provider-Name": "Google"
+        }
+
+    @apiParam {String} member_id: member ID
+    @apiParamExample {json} Request (Example)
+        {
+            "member_id": "58acbd42a80a5f"
+        }
+
+    @apiUse UnauthorizedAccessError
+    """
     req = request.get_json()
-    member_id = req.get('member')
+    member_id = req.get('member_id')
+
     reading_group = MongoUtil.add_group_member(group_id, member_id)
 
     # Check for valid group

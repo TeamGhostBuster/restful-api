@@ -227,13 +227,14 @@ def get_user_reading_lists(user):
 @group_read_permission_required
 def create_group_list(user):
     """
-    @api {post} /group/list Create a reading list in group
-    @apiName Create a reading list in group
+    @api {post} /group/list Create a group reading list
+    @apiName Create a group reading list
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
 
     @apiParam {String} name List name.
+    @apiParam {String} group_id Group ID.
     @apiParamExample {json} Request (Example)
         {
             "name": "CMPUT495 Seminar"
@@ -357,11 +358,13 @@ def add_article_to_group_list(user, list_id):
     article_id = req['article']
 
     reading_list = MongoUtil.add_article_to_list(list_id, article_id)
+    new_vote_object = MongoUtil.create_vote_object(list_id, article_id)
 
     # Check for valid request
-    if reading_list is None:
+    if (reading_list or new_vote_object) is None:
         return jsonify(msg="Bad request."), 400
 
     app.logger.info("User {} add article {} to list {}".format(user, article_id, list_id))
+    app.logger.info("User {} created new vote object".format(user))
 
     return jsonify(JsonUtil.serialize(reading_list)), 200
