@@ -1,7 +1,5 @@
 # Collaborative List API    
 
-[![Build Status](https://ci.vfree.org/job/CollaborativeList-API/badge/icon?style=flat)](https://ci.vfree.org/job/CollaborativeList-API/)
-
 ## Install
 `$ python3 setup.py install`
 
