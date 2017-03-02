@@ -11,7 +11,8 @@ from flask_cors import CORS, cross_origin
 config = {
     'prod': 'app.config.ProductionConfig',
     'deploy': 'app.config.DeployConfig',
-    'dev': 'app.config.DevelopmentConfig'
+    'dev': 'app.config.DevelopmentConfig',
+    'test': 'app.config.TestConfig'
 }
 
 # initialize flask instance

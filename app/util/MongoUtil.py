@@ -46,7 +46,7 @@ def archive_list(user, list_id):
         # Get the list
         archived_list = List.objects.get(id=ObjectId(list_id))
         User.objects.get(id=user.id, lists=archived_list)
-    except DoesNotExist:
+    except DoesNotExist as e:
         return None
 
     # Mark it as archived
@@ -100,7 +100,6 @@ def retrieve_group_list(group_id, list_id):
     return group
 
 
-
 # def get_user_all_lists(user):
 #     # user = User.objects.get(id=user.id, lists__)
 #     pipeline = [
@@ -133,21 +132,32 @@ def create_list(list_name, user):
     return new_list
 
 
-def create_article(title, list_id, description, url=None, tags=None):
-    # Check if list exists
-    if List.objects(id=ObjectId(list_id)).count() == 0:
-        return None
-
+def create_article(data, list_id):
     try:
+        # Check if list exists
+        List.objects.get(id=ObjectId(list_id))
         # Create new article
-        new_article = Article(title=title, description=description, url=url, tags=tags).save()
-    except ValidationError:
-        return None
+        new_article = Article(**data).save()
+    except Exception as e:
+        return type(e).__name__
 
     # Append article reference to the user's article lists
     List.objects(id=list_id).update_one(push__articles=new_article)
 
     return new_article
+
+
+def update_article(data, article_id):
+    try:
+        # Check if the article exists
+        article = Article.objects.get(id=ObjectId(article_id))
+        # Update article
+        Article.objects(id=ObjectId(article_id)).update_one(**data)
+    except Exception as e:
+        return type(e).__name__
+    # Article.objects(id=ObjectId(article_id)).update_one(**data)
+    article.reload()
+    return article
 
 
 def create_article_in_group(title, list_id, group_id, description, url=None, tags=None):

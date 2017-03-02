@@ -26,3 +26,7 @@ Build documentation with APIDOC
 Format code with PEP8 standard
 
 `$ make format`
+
+Run test
+
+`$ make test`

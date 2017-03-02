@@ -9,9 +9,9 @@ from app.util.AuthUtil import authorized_required, validate_id
 @authorized_required
 def add_comment(user, article_id):
     """
-    @api {get} /user/article/:id/comment Post comment to an article
+    @api {post} /user/article/:id/comment Post comment to an article
     @apiName Post comment to an article
-    @apiGroup Article
+    @apiGroup Comment
 
     @apiUse AuthorizationTokenHeader
 
@@ -46,3 +46,28 @@ def add_comment(user, article_id):
     app.logger.info('User {} Create comment {}'.format(user, new_comment.id))
 
     return jsonify(JsonUtil.serialize(new_comment))
+
+
+@app.route('/user/list/<string:list_id>/article/<string:article_id>/comment', methods=['GET'])
+@authorized_required
+def get_comment(user, list_id, article_id):
+    """
+    @api {get} /user/list/:id/article/:id Get comments of an article
+    @apiName Get comments of an article
+    @apiGroup Comment
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiSuccessExample {json} Example (Response)
+        {
+            "comments" : [{
+                "id": "afjlkdsfjafla",
+                "content": "i hate it",
+                "timestamp": "2017-02-04-19-59-59"
+            }]
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ArticleDoesNotExist
+    """
+    pass

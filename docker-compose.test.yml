@@ -1,0 +1,21 @@
+version: '2'
+services:
+    flaskapp-test:
+        build: .
+        container_name: flaskapp-test
+        networks:
+            - esnet
+        environment:
+            - FLASK_CONFIGURATION=test
+            - debug:debug1
+            - API_URL=http://localhost:80
+        restart: always
+        external_links:
+            - mongo
+            - mongo1
+            - mongo2
+            - elastic:elasticsearch
+
+networks:
+  esnet:
+    driver: bridge

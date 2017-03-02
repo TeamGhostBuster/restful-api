@@ -47,7 +47,7 @@ from .vote import model as vote_model
 """
 @apiDefine ListDoesNotExist
 apiError ListDoesNotExist The list does not exist
-@apiErrorExample Error 400
+@apiErrorExample Error 404
     {
         "msg": "List does not exist"
     }
@@ -56,7 +56,7 @@ apiError ListDoesNotExist The list does not exist
 """
 @apiDefine ArticleDoesNotExist
 apiError ArticleDoesNotExist The article does not exist
-@apiErrorExample Error 400
+@apiErrorExample Error 404
     {
         "msg": "Article does not exist"
     }
@@ -86,5 +86,23 @@ apiError UserNotInGroup The user is not in any group
 @apiErrorExample Error 204
     {
         "msg": "Group does not exist"
+    }
+"""
+
+"""
+@apiDefine ResourceDoesNotExist
+@apiError ResourceDoesNotExist The resource does not exist
+@apiErrorExample Error 404
+    {
+        "msg": "Resource does not exist"
+    }
+"""
+
+"""
+@apiDefine BadRequest
+@apiError BadRequest The resource does not exist
+@apiErrorExample Error 400
+    {
+        "msg": "Invalid Request"
     }
 """

@@ -13,6 +13,9 @@ setup(
         "requests",
         "setuptools",
         'marshmallow',
-        'flask-cors', 'elasticsearch'
+        'flask-cors',
+        'elasticsearch',
+        'pytest',
+        'pytest-ordering'
     ],
 )

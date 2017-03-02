@@ -1,6 +1,7 @@
 from app.util import ElasticSearchUtil
-from app.util import JsonUtil, RequestUtil
+from app.util import JsonUtil, RequestUtil, ResponseUtil
 from app.util.AuthUtil import *
+import os
 
 
 @app.route('/user/article/<string:article_id>', methods=['GET'])
@@ -13,7 +14,11 @@ def get_article(user, article_id):
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} id Article unique ID (Required).
+    @apiParam {String} list_id The list id.
+    @apiParamExample {json} Request (Example)
+        {
+
+        }
 
     @apiSuccess {String} id Article id.
     @apiSuccess {String} title Article title.
@@ -49,11 +54,11 @@ def get_article(user, article_id):
     return jsonify(JsonUtil.serialize(article)), 200
 
 
-@app.route('/user/article', methods=['POST'])
+@app.route('/user/list/<string:list_id>/article', methods=['POST'])
 @authorized_required
-def create_article(user):
+def create_article(user, list_id):
     """
-    @api {post} /user/article/ Create a article for user
+    @api {post} /user/list/:id/article/ Create a article for user
     @apiName Create a article for user
     @apiGroup Article
 
@@ -73,40 +78,92 @@ def create_article(user):
             "tags": ["tag1", "tag2", "tag3"]
         }
 
-    @apiSuccess {String} Message Success message.
+    @apiSuccess {json} Article json representation.
+    @apiSuccessExample {json} Respond (Example)
+        {
+            "id": "adlkfdalfjk",
+            "title": "God know what it is",
+            "description": "I don't know",
+            "url": "https://www.gooel.com/something",
+            "tags": ["tag1", "tag2", "tag3"]
+        }
 
     @apiUse UnauthorizedAccessError
-    @apiUse ListDoesNotExist
+    @apiUse ResourceDoesNotExist
+    @apiUse BadRequest
     """
-    # Parse request, parse empty string and
+    # Parse request into JSON dict
     req = RequestUtil.get_request()
 
-    title = req.get('title')
-    list_id = req.get('list_id')
-    description = req.get('description')
-    url = req.get('url', None)
-    tags = req.get('tags', None)
-
-    # Validate request
-    if not 'title' or not 'list_id':
-        return jsonify({
-            'msg': 'Invalid request'
-        }), 400
-
     # Create article
-    new_article = MongoUtil.create_article(title, list_id, description, url, tags)
+    result = MongoUtil.create_article(req, list_id)
 
-    # If the list does not exist
-    if new_article is None:
-        return jsonify({
-            'msg': 'List does not exist'
-        }), 400
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
-    # Save it to elasticsearch
-    ElasticSearchUtil.save_to_es(new_article)
+    if not os.getenv('FLASK_CONFIGURATION') == 'test':
+        # Save it to elasticsearch
+        ElasticSearchUtil.save_to_es(result)
 
-    app.logger.info('User {} Create article {} in List ID: {}'.format(user, new_article, list_id))
-    return jsonify(JsonUtil.serialize(new_article)), 200
+    app.logger.info('User {} Create article {} in List ID: {}'.format(user, result, list_id))
+    return jsonify(JsonUtil.serialize(result)), 200
+
+
+@app.route('/article/<string:article_id>', methods=['PUT'])
+@authorized_required
+def update_article(user, article_id):
+    """
+    @api {put} /article/:id Update a article
+    @apiName Update a article
+    @apiGroup Article
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} title The new article title.
+    @apiParam {String} description The new description.
+    @apiParam {String} [url] The new url to the article.
+    @apiParam {Json} [tags] The new user custom tags.
+    @apiParamExample {json} Request (Example):
+        {
+            "title": "God know what it is",
+            "description": "I don't know",
+            "url": "https://www.gooel.com/something",
+            "tags": ["tag1", "tag2", "tag3"]
+        }
+
+    @apiSuccess {json} The new article json data.
+    @apiSuccessExample {json} Respond (Example)
+        {
+            "id": "adlkfdalfjk",
+            "title": "God know what it is",
+            "description": "I don't know",
+            "url": "https://www.gooel.com/something",
+            "tags": ["tag1", "tag2", "tag3"]
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    @apiUse BadRequest
+    """
+    # Parse request into JSON dict
+    print(request.get_json())
+    req = RequestUtil.get_request()
+    print(req)
+    # Update article
+    result = MongoUtil.update_article(req, article_id)
+
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    # Update in elasticsearch
+    if not os.getenv('FLASK_CONFIGURATION') == 'test':
+        # Save it to elasticsearch
+        ElasticSearchUtil.save_to_es(result)
+
+    app.logger.info('User {} Update article {}'.format(user, result))
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/group/article', methods=['POST'])
@@ -156,6 +213,10 @@ def create_article_in_group(user):
     new_article = MongoUtil.create_article_in_group(title, list_id, group_id,
                                                     description, url, tags)
 
+    if not os.getenv('FLASK_CONFIGURATION') == 'test':
+        # Save it to elasticsearch
+        ElasticSearchUtil.save_to_es(new_article)
+
     app.logger.info('User {} Create article {} in List ID: {} in Group ID: {}'.format(
         user, new_article, list_id, group_id))
     return jsonify(JsonUtil.serialize(new_article)), 200
@@ -198,8 +259,9 @@ def add_tags(user, article_id):
             'msg': 'List does not exist'
         }), 400
 
-    # Save it to elasticsearch
-    ElasticSearchUtil.save_to_es(article)
+    if not os.getenv('FLASK_CONFIGURATION') == 'test':
+        # Save it to elasticsearch
+        ElasticSearchUtil.save_to_es(article)
 
     app.logger.info('User {} Add tag {} to {}'.format(user, tag, article))
     return jsonify(JsonUtil.serialize(article)), 200

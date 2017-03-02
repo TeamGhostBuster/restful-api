@@ -56,3 +56,14 @@ class DeployConfig(BaseConfig):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
+
+
+class TestConfig(BaseConfig):
+    DEBUG = True
+
+    MONGODB_SETTINGS = {
+        'HOST': 'mongodb://mongo,mongo1,mongo2/raspberry-test',
+        'PORT': 27017,
+        'replicaset': 'mongo-replica',
+        'READ_PREFERENCE': ReadPreference.SECONDARY
+    }

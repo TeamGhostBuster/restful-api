@@ -1,9 +1,4 @@
-from app.api.article.model import Article, ArticleSchema
-from app.api.comment.model import Comment, CommentSchema
-from app.api.list.model import List, ListSchema
-from app.api.user.model import User, UserSchema
-from app.api.group.model import Group, GroupSchema
-from app.api.vote.model import Vote, VoteSchema
+import importlib
 
 
 def serialize(obj, only=tuple(), exclude=tuple()):
@@ -13,27 +8,17 @@ def serialize(obj, only=tuple(), exclude=tuple()):
     :return: A dictionary
     """
 
-    # An Article object
-    if isinstance(obj, Article):
-        schema = ArticleSchema(only=only, exclude=exclude)
-        return dict(schema.dump(obj).data)
+    # Read from type name
+    type_name = type(obj).__name__
+    try:
+        # Convert string into actual class object
+        TypeSchema = getattr(importlib.import_module('app.api.{}.model'.format
+                                                     (type_name.lower())), '{}Schema'.format(type_name))
+    except ImportError:
+        return None
 
-    elif isinstance(obj, Comment):
-        schema = CommentSchema(only=only, exclude=exclude)
-        return schema.dump(obj).data
+    # Init the TypeSchema
+    schema = TypeSchema(only=only, exclude=exclude)
 
-    elif isinstance(obj, List):
-        schema = ListSchema(only=only, exclude=exclude)
-        return dict(schema.dump(obj).data)
-
-    elif isinstance(obj, User):
-        schema = UserSchema(only=only, exclude=exclude)
-        return dict(schema.dump(obj).data)
-
-    elif isinstance(obj, Group):
-        schema = GroupSchema(only=only, exclude=exclude)
-        return dict(schema.dump(obj).data)
-
-    elif isinstance(obj, Vote):
-        schema = VoteSchema(only=only, exclude=exclude)
-        return dict(schema.dump(obj).data)
+    # Convert into JSON-dict
+    return dict(schema.dump(obj).data)
