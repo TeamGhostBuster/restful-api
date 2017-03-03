@@ -14,29 +14,26 @@ def get_article(user, article_id):
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} list_id The list id.
-    @apiParamExample {json} Request (Example)
-        {
-
-        }
+    @apiParam {String} id The Article id
 
     @apiSuccess {String} id Article id.
     @apiSuccess {String} title Article title.
-    @apiSuccess {String} list_id List id.
     @apiSuccess {Object[]} comments User comments.
-    @apiSuccess {Object} comments.content The content.
+    @apiSuccess {String} comments.id The comment id.
+    @apiSuccess {String} comments.content The content.
     @apiSuccess {String} comments.timestamp The timestamp of the comment.
+    @apiSuccess {Email} comments.author The author's email.
     @apiSuccessExample {json} Response (Example):
         {
             "id": "aldkfjadls",
             "title": "Process",
             "description": "adlsfjdlask",
             "url": "https://www.google.com/something",
-            "list_id": "ladsjflas",
             "comments" : [{
                 "id": "afjlkdsfjafla",
                 "content": "i hate it",
-                "timestamp": "2017-02-04-19-59-59"
+                "timestamp": "2017-02-04-19-59-59",
+                "author": "tester@ualberta.ca"
             }],
             "tags": ["science", "computer"]
         }

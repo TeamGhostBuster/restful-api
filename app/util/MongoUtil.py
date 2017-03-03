@@ -244,13 +244,16 @@ def delete_article(user, list_id, article_id):
 
 
 def add_comment(user, article_id, comment, public=True):
-    # Check if the article exists
-    if find_article(article_id) is None:
-        return None
+    try:
+        # Check if article exists
+        article = Article.objects.get(id=ObjectId(article_id))
+        # Post comment
+        new_comment = Comment(content=comment, public=public, author=user.email).save()
+        # Add reference to the article
+        Article.objects(id=article.id).update_one(push__comments=new_comment)
 
-    # Post comment
-    new_comment = Comment(content=comment, article=article_id, public=public,
-                          user=user).save()
+    except Exception as e:
+        return type(e).__name__
 
     return new_comment
 

@@ -3,8 +3,6 @@ import datetime
 from marshmallow import Schema, fields
 
 from app import db
-from app.api.article.model import Article
-from app.api.user.model import User
 
 
 class Comment(db.Document):
@@ -13,9 +11,8 @@ class Comment(db.Document):
     """
     content = db.StringField(required=True)
     created_at = db.DateTimeField(default=datetime.datetime.now)
-    article = db.ReferenceField(Article)
-    user = db.ReferenceField(User)
-    public = db.BooleanField()
+    author = db.EmailField()
+    public = db.BooleanField(default=True)
 
 
 class CommentSchema(Schema):
@@ -25,10 +22,9 @@ class CommentSchema(Schema):
     id = fields.String()
     content = fields.Str()
     created_at = fields.DateTime()
-    user = fields.String()
-    article = fields.String()
+    author = fields.Str()
     public = fields.Boolean()
 
     class Meta:
-        fields = ('id', 'content', 'created_at', 'user', 'article', 'public')
+        fields = ('id', 'content', 'created_at', 'author', 'public')
         order = True

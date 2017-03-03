@@ -1,15 +1,15 @@
 from flask import jsonify, request
 
 from app import app
-from app.util import MongoUtil, JsonUtil, RequestUtil
+from app.util import MongoUtil, JsonUtil, RequestUtil, ResponseUtil
 from app.util.AuthUtil import authorized_required, validate_id
 
 
-@app.route('/user/article/<string:article_id>/comment', methods=['POST'])
+@app.route('/article/<string:article_id>/comment', methods=['POST'])
 @authorized_required
 def add_comment(user, article_id):
     """
-    @api {post} /user/article/:id/comment Post comment to an article
+    @api {post} /article/:id/comment Post comment to an article
     @apiName Post comment to an article
     @apiGroup Comment
 
@@ -25,49 +25,22 @@ def add_comment(user, article_id):
         }
 
     @apiUse UnauthorizedAccessError
-    @apiUse ArticleDoesNotExist
+    @apiUse ResourceDoesNotExist
+    @apiUse BadRequest
     """
-    # Validate the article id
     app.logger.info('User {} Access {}'.format(user, request.full_path))
-
-    if not validate_id(article_id):
-        return jsonify(msg='ObjectID is not valid'), 400
 
     # Get request body
     req = RequestUtil.get_request()
     comment = req.get('comment')
     public = req.get('public')
 
-    new_comment = MongoUtil.add_comment(user, article_id, comment, public)
+    # Add comment
+    result = MongoUtil.add_comment(user, article_id, comment, public)
 
-    if new_comment is None:
-        return jsonify(msg='Article does not exist'), 400
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} Create comment {}'.format(user, new_comment.id))
-
-    return jsonify(JsonUtil.serialize(new_comment))
-
-
-@app.route('/user/list/<string:list_id>/article/<string:article_id>/comment', methods=['GET'])
-@authorized_required
-def get_comment(user, list_id, article_id):
-    """
-    @api {get} /user/list/:id/article/:id Get comments of an article
-    @apiName Get comments of an article
-    @apiGroup Comment
-
-    @apiUse AuthorizationTokenHeader
-
-    @apiSuccessExample {json} Example (Response)
-        {
-            "comments" : [{
-                "id": "afjlkdsfjafla",
-                "content": "i hate it",
-                "timestamp": "2017-02-04-19-59-59"
-            }]
-        }
-
-    @apiUse UnauthorizedAccessError
-    @apiUse ArticleDoesNotExist
-    """
-    pass
+    app.logger.info('User {} Create comment {}'.format(user, result.id))
+    return jsonify(JsonUtil.serialize(result))
