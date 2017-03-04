@@ -1,92 +1,72 @@
-from app.util import MongoUtil
 from app.util.AuthUtil import *
-from app.util import JsonUtil
+from app.util import JsonUtil, ResponseUtil, MongoUtil
 
 
-# @app.route('/vote/<string:vote_id>', methods=['GET'])
-# @authorized_required
-# def get_vote_count(user, vote_id):
-#     pass
-
-
-@app.route('/vote/<string:vote_id>', methods=['GET'])
+@app.route('/group/<string:group_id>/list/<string:list_id>/article/<string:article_id>/upvote', methods=['POST'])
 @authorized_required
-def get_vote_object(user, vote_id):
+def upvote_article(user, group_id, list_id, article_id):
     """
-    @api {get} /vote/:id Get vote object
-    @apiName Get vote object
+    @api {post} /group/list/:id/article/:id/upvote Upvote an article in group
+    @apiName Upvote an article in group
     @apiGroup Vote
 
     @apiUse AuthorizationTokenHeader
 
     @apiParam {String} id Vote object's unique ID.
 
-    @apiSuccess {String} id Unique vote object id.
-    @apiSuccess {Integer} vote_count Number of votes for a vote object.
-    @apiSuccess {Object[]} article The article the vote object references.
-    @apiSuccess {String} article.id Article ID.
-    @apiSuccess {String} article.title Article title.
-    @apiSuccess {Object[]} list The list the vote object references.
-    @apiSuccess {String} list.id The list's ID.
-    @apiSuccess {String} list.name The name of the list.
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    @apiUse BadRequest
+    @apiUse UserHasVoted
+    """
+    # Upvote the article
+    result = MongoUtil.upvote_article(user, group_id, list_id, article_id)
 
-    @apiSuccessExample {json} Response (Example):
+    # If there is error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    return jsonify(JsonUtil.serialize(result, only=('article', 'list', 'vote_count'))), 200
+
+
+@app.route('/group/<string:group_id>/list/<string:list_id>/article/<string:article_id>/downvote', methods=['POST'])
+@authorized_required
+def downvote_article(user, group_id, list_id, article_id):
+    """
+    @api {post} /group/list/:id/article/:id/upvote Downvote an article in group
+    @apiName Downvote an article in group
+    @apiGroup Vote
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} id Vote object's unique ID.
+
+    @apiSuccess {Integer} vote_count The total vote count
+    @apiSuccess {Object} list The list associate with this vote
+    @apiSuccess {String} list.id The id of the list associates with this vote
+    @apiSuccess {Object} article The article associate with this vote
+    @apiSuccess {String} list.id The id of the article associates with this vote
+    @apiSuccessExample {json} Response (Example)
         {
-            "id": "58af5d8bc05d63748e93ceec",
-            "vote_count": -2,
-            "article": {
-                "id": "58af4659c05d636a7bf22793",
-                "title": "Totally Not Software Processes"
-            },
+            "vote_count": 2,
             "list": {
-                "id": "58adf7ff0e7cfa33699f29bc",
-                "name": "CMPUT404 Reading List"
+                "id": "ajsdklfdas"
+            },
+            "article: {
+                "id": "dajlkfaskl"
             }
         }
 
     @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    @apiUse BadRequest
+    @apiUse UserHasVoted
     """
-    # Get the vote object
-    vote_object = MongoUtil.find_vote(vote_id)
+    # Downvote the article
+    result = MongoUtil.downvote_article(user, group_id, list_id, article_id)
 
-    # Check for None
-    if vote_object is None:
-        return jsonify(msg="Vote object does not exist."), 404
+    # If there is error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
-    return jsonify(JsonUtil.serialize(vote_object)), 200
-
-
-@app.route('/vote/<string:vote_id>', methods=['POST'])
-@authorized_required
-def add_vote(user, vote_id):
-    """
-    @api {post} /vote/:id Add a group member's vote to the vote object
-    @apiName Add a group member's vote to the vote object
-    @apiGroup Vote
-
-    @apiHeader {String} Access-Token Access token obtains from Oauth2 provider.
-    @apiHeader {String} Provider-Name Oauth2 provider name.
-    @apiHeaderExample {json} Header (Example):
-        {
-            "Access-Token": "12xsdklajlkadsf",
-            "Provider-Name": "Google"
-        }
-
-    @apiParam {String} upvote Set to either 1 (for upvote) or 0 (for downvote)
-    @apiParamExample {json} Request (Example)
-        {
-            "upvote": "1"
-        }
-
-    @apiUse UnauthorizedAccessError
-    """
-    # Get upvote boolean value from request
-    req = request.get_json()
-    upvote = bool(int(req['upvote']))
-
-    vote_object = MongoUtil.add_vote(vote_id, upvote, user)
-
-    if vote_object is None:
-        return jsonify(msg="Bad request."), 404
-
-    return jsonify(JsonUtil.serialize(vote_object)), 200
+    return jsonify(JsonUtil.serialize(result, only=('article', 'list', 'vote_count'))), 200

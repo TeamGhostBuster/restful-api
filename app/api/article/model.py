@@ -15,7 +15,7 @@ class Article(db.Document):
         return str(self)
 
     def __str__(self):
-        return '{{id: {}, title: {}}}'.format(self.id, self.title)
+        return 'id: {}, title: {}'.format(self.id, self.title)
 
 
 class ArticleSchema(Schema):

@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
-from flask_mongoengine import ValidationError
+from mongoengine.queryset.visitor import Q
 
 from app.api.article.model import Article
 from app.api.comment.model import Comment
@@ -10,6 +10,8 @@ from app.api.group.model import Group
 from app.api.list.model import List
 from app.api.user.model import User
 from app.api.vote.model import Vote
+
+from app.exception.UserHasVoted import UserHasVoted
 
 
 def find_user(email):
@@ -33,10 +35,10 @@ def create_user(email, first_name, last_name):
 
 def find_list(list_id):
     try:
-        # Find user's list
+        # Find reading list
         user_list = List.objects.get(id=ObjectId(list_id))
-    except DoesNotExist:
-        pass
+    except Exception as e:
+        return type(e).__name__
 
     return user_list
 
@@ -160,7 +162,7 @@ def update_article(data, article_id):
     return article
 
 
-def create_article_in_group(title, list_id, group_id, description, url=None, tags=None):
+def create_article_in_group(data, list_id, group_id):
     try:
         # Check if the list exist
         the_list = List.objects.get(id=ObjectId(list_id))
@@ -170,7 +172,7 @@ def create_article_in_group(title, list_id, group_id, description, url=None, tag
         return None
 
     # create new article
-    new_article = create_article(title, list_id, description, url, tags)
+    new_article = create_article(data, list_id)
 
     return new_article
 
@@ -365,44 +367,94 @@ def share_list_to_group(user, list_id, group_id):
     return duplicate_list
 
 
-def create_vote_object(list_id, article_id):
+def check_vote_exist(list, article):
     try:
-        reading_list = find_list(list_id)
-        article = find_article(article_id)
+        # Try to retrieve the vote
+        vote = Vote.objects.get(list=list, article=article)
     except DoesNotExist:
-        return None
+        # If it does not exist, create a new one instead
+        vote = Vote(list=list, article=article).save()
 
-    new_vote_object = Vote(article=article, list=reading_list).save()
-    return new_vote_object
+    return vote
 
 
-def find_vote(vote_id):
+def check_user_has_upvoted(user, vote):
     try:
-        vote_object = Vote.objects.get(id=ObjectId(vote_id))
+        # Check if user has upvoted or not
+        Vote.objects.get(Q(id=vote.id) & Q(upvoter_list=user))
     except DoesNotExist:
-        return None
-    return vote_object
+        # User have not upvote
+        return False
+
+    return True
 
 
-def add_vote(vote_id, upvote, voter):
-    # Find the vote object
+def check_user_has_downvoted(user, vote):
     try:
-        vote_object = find_vote(vote_id)
+        # Check if user has downvoted or not
+        vote = Vote.objects.get(Q(id=vote.id) & Q(downvoter_list=user))
     except DoesNotExist:
-        return None
+        # User have not downvote
+        return False
 
-    # Add record of user voting/check if user has already voted
+    return True
+
+
+def upvote_article(user, group_id, list_id, article_id):
     try:
-        Vote.objects.get(id=ObjectId(vote_id), voter_list=voter)
-    except DoesNotExist:
-        Vote.objects(id=ObjectId(vote_id)).update_one(push__voter_list=voter)
+        # Resources check
+        article = Article.objects.get(id=ObjectId(article_id))
+        group = Group.objects.get(id=ObjectId(group_id), lists=ObjectId(list_id), members=user)
+        list = List.objects.get(id=ObjectId(list_id), articles=article)
 
-        if upvote:
-            # Increment in up vote
-            Vote.objects(id=ObjectId(vote_id)).update_one(inc__vote_count=1)
-        else:
-            # decrement if down vote
-            Vote.objects(id=ObjectId(vote_id)).update_one(dec__vote_count=1)
+        # Create new vote
+        vote = check_vote_exist(list, article)
+        if check_user_has_upvoted(user, vote):
+            raise UserHasVoted('User cannot vote twice.')
 
-    vote_object.reload()
-    return vote_object
+        # Upvote the article
+        Vote.objects(id=vote.id).update_one(push__upvoter_list=user, pull__downvoter_list=user, vote_count=vote.vote_count+1)
+    except Exception as e:
+        return type(e).__name__
+
+    vote.reload()
+    return vote
+
+
+def downvote_article(user, group_id, list_id, article_id):
+    try:
+        # Resources check
+        article = Article.objects.get(id=ObjectId(article_id))
+        group = Group.objects.get(id=ObjectId(group_id), lists=ObjectId(list_id), members=user)
+        list = List.objects.get(id=ObjectId(list_id), articles=article)
+
+        # Create new vote
+        vote = check_vote_exist(list, article)
+        if check_user_has_downvoted(user, vote):
+            raise UserHasVoted('User cannot vote twice.')
+
+        # Downvote the article
+        Vote.objects(id=vote.id).update_one(push__downvoter_list=user, pull__upvoter_list=user, vote_count=vote.vote_count-1)
+    except Exception as e:
+        return type(e).__name__
+
+    vote.reload()
+    return vote
+
+
+def get_vote_count(list_id, article_id):
+    try:
+        list = List.objects.get(id=ObjectId(list_id))
+        article = Article.objects.get(id=ObjectId(article_id))
+        vote = Vote.objects.get(Q(list=list) & Q(article=article))
+    except Exception as e:
+        return type(e).__name__
+
+    return vote.vote_count
+
+
+def add_vote_count(group_list):
+    for i, article in enumerate(group_list['articles']):
+        group_list['articles'][i]['vote_count'] = get_vote_count(group_list['id'], article['id'])
+
+    return group_list

@@ -1,15 +1,13 @@
-from app.util import JsonUtil
-from app.util import MongoUtil
-from app.util import RequestUtil
+from app.util import JsonUtil, MongoUtil, RequestUtil, ResponseUtil
 from app.util.AuthUtil import *
 
 
-@app.route('/user/list/<string:list_id>', methods=['GET'])
+@app.route('/user/list/<string:list_id>/articles', methods=['GET'])
 @authorized_required
 def get_articles_from_list(user, list_id):
     """
-    @api {get} /user/list/:id Get articles of a list
-    @apiName Get articles of a list
+    @api {get} /user/list/:id/articles Get articles of a personal list
+    @apiName Get articles of a personal list
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
@@ -37,13 +35,61 @@ def get_articles_from_list(user, list_id):
     """
     app.logger.info('User {} Access {}'.format(user, request.full_path))
 
-    reading_list = MongoUtil.find_list(list_id)
-    # check for bad list
-    if reading_list is None:
-        return jsonify(msg='List does not exist'), 404
+    result = MongoUtil.find_list(list_id)
 
-    # convert the articles into json format
-    return jsonify(JsonUtil.serialize(reading_list)), 200
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    return jsonify(JsonUtil.serialize(result)), 200
+
+
+@app.route('/group/<string:group_id>/list/<string:list_id>/articles', methods=['GET'])
+@authorized_required
+def get_articles_from_group_list(user, group_id, list_id):
+    """
+    @api {get} /group/list/:id/articles Get articles of a group list
+    @apiName Get articles of a group list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} id List unique ID.
+
+    @apiSuccess {String} List id.
+    @apiSuccess {String} List name.
+    @apiSuccess {Object[]} articles Articles data.
+    @apiSuccess {String} articles.id Article id.
+    @apiSuccess {String} article.title Article title.
+    @apiSuccess {Integer} article.vote_count The vote count.
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "name": "CMPUT 391 Seminar",
+            "articles": [
+                {
+                    "id": "adlfajdls",
+                    "title": "Process",
+                    "vote_count": 1
+                }
+            ]
+        }
+
+    @apiUse UnauthorizedAccessError
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    # Get articles from list
+    result = MongoUtil.find_list(list_id)
+
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    # Add vote count to the return result
+    group_list = MongoUtil.add_vote_count(JsonUtil.serialize(result))
+
+    return jsonify(group_list), 200
 
 
 @app.route('/user/list', methods=['POST'])

@@ -106,3 +106,12 @@ apiError UserNotInGroup The user is not in any group
         "msg": "Invalid Request"
     }
 """
+
+"""
+@apiDefine UserHasVoted
+@apiError ResourceDoesNotExist The resource does not exist
+@apiErrorExample Error 403
+    {
+        "msg": "User cannot vote twice"
+    }
+"""

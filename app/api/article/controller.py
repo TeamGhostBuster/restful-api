@@ -8,8 +8,8 @@ import os
 @authorized_required
 def get_article(user, article_id):
     """
-    @api {get} /user/article/:id Get a article
-    @apiName Get a article
+    @api {get} /user/article/:id Get a article in personal list
+    @apiName Get a article in personal list
     @apiGroup Article
 
     @apiUse AuthorizationTokenHeader
@@ -32,7 +32,7 @@ def get_article(user, article_id):
             "comments" : [{
                 "id": "afjlkdsfjafla",
                 "content": "i hate it",
-                "timestamp": "2017-02-04-19-59-59",
+                "created_at": "2017-02-04-19-59-59",
                 "author": "tester@ualberta.ca"
             }],
             "tags": ["science", "computer"]
@@ -163,18 +163,16 @@ def update_article(user, article_id):
     return jsonify(JsonUtil.serialize(result)), 200
 
 
-@app.route('/group/article', methods=['POST'])
-@group_read_permission_required
-def create_article_in_group(user):
+@app.route('/group/<string:group_id>/list/<string:list_id>/article', methods=['POST'])
+@authorized_required
+def create_article_in_group(user, group_id, list_id):
     """
-    @api {post} /group/article/ Create a article in group
+    @api {post} /group/:id/list/:id/article/ Create a article in group
     @apiName Create a article in group
     @apiGroup Article
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} list_id The list id.
-    @apiParam {String} group_id The group id.
     @apiParam {String} title The article title.
     @apiParam {String} description The description.
     @apiParam {String} [url] The url to the article.
@@ -182,8 +180,6 @@ def create_article_in_group(user):
     @apiParamExample {json} Request (Example):
         {
             "title": "God know what it is",
-            "list_id": "aldkfjdaslkfjl",
-            "group_id": "aldkfja"
             "description": "I don't know",
             "url": "https://www.gooel.com/something",
             "tags": ["tag1", "tag2", "tag3"]
@@ -199,24 +195,19 @@ def create_article_in_group(user):
     # Parse request, parse empty string and
     req = RequestUtil.get_request()
 
-    title = req.get('title')
-    list_id = req.get('list_id')
-    group_id = req.get('group_id')
-    description = req.get('description')
-    url = req.get('url', None)
-    tags = req.get('tags', None)
-
     # Create new article
-    new_article = MongoUtil.create_article_in_group(title, list_id, group_id,
-                                                    description, url, tags)
+    result = MongoUtil.create_article_in_group(req, list_id, group_id)
+
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
     if not os.getenv('FLASK_CONFIGURATION') == 'test':
         # Save it to elasticsearch
-        ElasticSearchUtil.save_to_es(new_article)
+        ElasticSearchUtil.save_to_es(result)
 
     app.logger.info('User {} Create article {} in List ID: {} in Group ID: {}'.format(
-        user, new_article, list_id, group_id))
-    return jsonify(JsonUtil.serialize(new_article)), 200
+        user, result, list_id, group_id))
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/user/article/<string:article_id>/tag', methods=['POST'])

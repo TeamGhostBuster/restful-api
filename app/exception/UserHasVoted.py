@@ -1,0 +1,2 @@
+class UserHasVoted(Exception):
+    pass
