@@ -8,7 +8,7 @@ headers = {'Access-Token': 'michaellam.lzc',
            'Provider-Name': 'Google',
            'Content-Type': 'application/json'}
 
-base_url = os.getenv('API_URL', 'http://localhost:5000')
+base_url = os.getenv('API_URL', 'http://127.0.0.1:5000')
 
 # Global variable that store the ID of document for the sake of time
 global global_id
@@ -54,16 +54,12 @@ def post(url, data=None):
                                            json=data)
                 else:
                     json_ids = [global_id[i] for i in f.__defaults__[1]]
-                    print('upcoming')
-                    print(data.format(*json_ids))
                     result = requests.post(base_url + url,
                                            headers=headers,
                                            json=json.loads(data.format(*json_ids)))
             elif len(f.__defaults__) == 3:
                 url_ids = [global_id[i] for i in f.__defaults__[1]]
                 json_ids = [global_id[i] for i in f.__defaults__[2]]
-                # print('upcoming')
-                # print(data.format(*json_ids))
                 result = requests.post(base_url + url.format(*url_ids),
                                        headers=headers,
                                        json=json.loads(data.format(*json_ids))[0])

@@ -6,7 +6,7 @@ from app.util import JsonUtil, ResponseUtil, MongoUtil
 @authorized_required
 def upvote_article(user, group_id, list_id, article_id):
     """
-    @api {post} /group/list/:id/article/:id/upvote Upvote an article in group
+    @api {post} /group/:id/list/:id/article/:id/upvote Upvote an article in group
     @apiName Upvote an article in group
     @apiGroup Vote
 
@@ -33,7 +33,7 @@ def upvote_article(user, group_id, list_id, article_id):
 @authorized_required
 def downvote_article(user, group_id, list_id, article_id):
     """
-    @api {post} /group/list/:id/article/:id/upvote Downvote an article in group
+    @api {post} /group/:id/list/:id/article/:id/upvote Downvote an article in group
     @apiName Downvote an article in group
     @apiGroup Vote
 
