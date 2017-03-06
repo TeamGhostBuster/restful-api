@@ -141,23 +141,39 @@ def delete_article(user, list_id, article_id):
     @apiParam {String} list_id The list id.
     @apiParam {String} article_id The article id.
 
-    @apiSuccess {JSON} List the new list in json string.
+    @apiSuccess {String} List id.
+    @apiSuccess {String} List name.
+    @apiSuccess {Object[]} articles Articles data.
+    @apiSuccess {String} articles.id Article id.
+    @apiSuccess {String} article.title Article title.
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "name": "CMPUT 391 Seminar",
+            "articles": [
+                {
+                    "id": "adlfajdls",
+                    "title": "Process"
+                }
+            ]
+        }
+
 
     @apiUse UnauthorizedAccessError
-    @apiUse ListDoesNotExist
-    @apiUse ArticleDoesNotExist
+    @apiUse ResourceDoesNotExist
     """
     app.logger.info('User {} Access {}'.format(user, request.full_path))
 
     # Delete the article from the list
-    the_list = MongoUtil.delete_article(user, list_id, article_id)
+    result = MongoUtil.delete_article(user, list_id, article_id)
 
-    if the_list is None:
-        return jsonify(msg='List/Article does not exists'), 400
+    # if error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
     app.logger.info('User {} Delete article {} From list {}'.format(user, article_id, list_id))
 
-    return jsonify(JsonUtil.serialize(the_list)), 200
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/user/list/<string:list_id>/archive', methods=['DELETE'])

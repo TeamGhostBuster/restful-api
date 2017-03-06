@@ -167,12 +167,13 @@ def create_article_in_group(data, list_id, group_id):
         # Check if the list exist
         the_list = List.objects.get(id=ObjectId(list_id))
         # Check if the list belongs to the group
-        the_group = Group.objects.get(id=ObjectId(group_id), lists=the_list)
-    except DoesNotExist:
-        return None
-
-    # create new article
-    new_article = create_article(data, list_id)
+        the_group = Group.objects.get(Q(id=ObjectId(group_id)) & Q(lists=the_list))
+        # create new article
+        new_article = create_article(data, list_id)
+        # init the vote
+        Vote(article=new_article, list=the_list).save()
+    except Exception as e:
+        return type(e).__name__
 
     return new_article
 
@@ -224,21 +225,13 @@ def add_tag(article_id, tag):
 def delete_article(user, list_id, article_id):
     # Retrieve the articled and list to be deleted
     try:
-        the_list = List.objects.get(id=ObjectId(list_id))
+        # Check resource
         the_article = Article.objects.get(id=ObjectId(article_id))
-    except DoesNotExist:
-        return None
-
-    # Check if user has permission to the list
-    if the_list not in user.lists:
-        return None
-
-    # Check if the article exists in the list
-    if the_article not in the_list.articles:
-        return None
-
-    # Remove the article from the list
-    List.objects(id=the_list.id).update_one(pull__articles=the_article)
+        the_list = List.objects.get(Q(id=ObjectId(list_id)) & Q(articles=the_article))
+        # Remove the article from the list
+        List.objects(id=the_list.id).update_one(pull__articles=the_article)
+    except Exception as e:
+        return type(e).__name__
 
     the_list.reload()
 
@@ -412,8 +405,12 @@ def upvote_article(user, group_id, list_id, article_id):
         if check_user_has_upvoted(user, vote):
             raise UserHasVoted('User cannot vote twice.')
 
-        # Upvote the article
-        Vote.objects(id=vote.id).update_one(push__upvoter_list=user, pull__downvoter_list=user, vote_count=vote.vote_count+1)
+        # Revoke vote
+        if check_user_has_downvoted(user, vote):
+            Vote.objects(id=vote.id).update_one(pull__downvoter_list=user, vote_count=vote.vote_count + 1)
+        else:
+            # Upvote article
+            Vote.objects(id=vote.id).update_one(push__upvoter_list=user, vote_count=vote.vote_count+1)
     except Exception as e:
         return type(e).__name__
 
@@ -433,8 +430,12 @@ def downvote_article(user, group_id, list_id, article_id):
         if check_user_has_downvoted(user, vote):
             raise UserHasVoted('User cannot vote twice.')
 
-        # Downvote the article
-        Vote.objects(id=vote.id).update_one(push__downvoter_list=user, pull__upvoter_list=user, vote_count=vote.vote_count-1)
+        # User is just trying to take vote back
+        if check_user_has_upvoted(user, vote):
+            Vote.objects(id=vote.id).update_one(pull__upvoter_list=user, vote_count=vote.vote_count-1)
+        else:
+            # Downvote
+            Vote.objects(id=vote.id).update_one(push__downvoter_list=user, vote_count=vote.vote_count-1)
     except Exception as e:
         return type(e).__name__
 

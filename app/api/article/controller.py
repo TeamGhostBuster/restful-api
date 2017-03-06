@@ -55,13 +55,12 @@ def get_article(user, article_id):
 @authorized_required
 def create_article(user, list_id):
     """
-    @api {post} /user/list/:id/article/ Create a article for user
+    @api {post} /user/list/:id/article Create a article for user
     @apiName Create a article for user
     @apiGroup Article
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} list_id The list id.
     @apiParam {String} title The article title.
     @apiParam {String} description The description.
     @apiParam {String} [url] The url to the article.
@@ -69,7 +68,6 @@ def create_article(user, list_id):
     @apiParamExample {json} Request (Example):
         {
             "title": "God know what it is",
-            "list_id": "aldkfjdaslkfjl",
             "description": "I don't know",
             "url": "https://www.gooel.com/something",
             "tags": ["tag1", "tag2", "tag3"]
@@ -167,7 +165,7 @@ def update_article(user, article_id):
 @authorized_required
 def create_article_in_group(user, group_id, list_id):
     """
-    @api {post} /group/:id/list/:id/article/ Create a article in group
+    @api {post} /group/:id/list/:id/article Create a article in group
     @apiName Create a article in group
     @apiGroup Article
 
