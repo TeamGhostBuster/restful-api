@@ -20,5 +20,5 @@ test:
 	docker-compose -f docker-compose.test.yml build
 	docker-compose -f docker-compose.test.yml up -d --force-recreate
 	@sleep 10
-	docker exec -it flaskapp-test /wait-for-it.sh localhost:80 -- pytest
+	docker exec -it flaskapp-test /wait-for-it.sh localhost:80 -- pytest -s -vvv
 	docker rm -f flaskapp-test
