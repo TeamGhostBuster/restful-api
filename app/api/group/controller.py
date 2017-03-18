@@ -1,4 +1,4 @@
-from app.util import JsonUtil, RequestUtil
+from app.util import JsonUtil, RequestUtil, ResponseUtil
 from app.util.AuthUtil import *
 
 
@@ -83,40 +83,61 @@ def create_group(user):
             "Provider-Name": "Google"
         }
 
-    @apiParam {String} name Group name
-    @apiParam {String} [members[ comma-separated string of member IDs
-    @apiParam {String} [description] description
+    @apiParam {String} name Group name.
+    @apiParam {String[]} [members] A list of member email.
+    @apiParam {String} [description] description.
     @apiParamExample {json} Request (Example)
         {
             "name": "CMPUT495 Seminar",
-            "members": "58acbd4485ed06eb52a80a5f,58abcd4345ed06fb52a91a5e"
+            "members": ["test@ualberta.ca", "abc@ualberta.ca"],
             "description": "Group for CMPUT495 Seminar"
         }
-
+    
+    @apiSuccessExample {json} Response (Example):
+        {
+            "description": null,
+            "id": "58cc4f6ac6091e84d0db5c1d",
+            "lists": [],
+            "members": [
+                {
+                    "first_name": "Zichun",
+                    "id": "58cc4e32c6091e83c8611208",
+                    "last_name": "Lin"
+                },
+                {
+                    "first_name": "Michael",
+                    "id": "58cc4da5c6091e83605ae5af",
+                    "last_name": "Lin"
+                }
+            ],
+            "moderator": {
+                "first_name": "Zichun",
+                "id": "58cc4e32c6091e83c8611208",
+                "last_name": "Lin"
+            },
+            "name": "Group #4"
+        }
+        
     @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
     """
     app.logger.info('User {} Access {}'.format(user, request.full_path))
 
     # Get group name + group parameters from api
     req = RequestUtil.get_request()
     group_name = req.get('name')
-    moderator = user
     members = req.get('members', None)
-
-    # Only split if it is not None
-    if members is not None:
-        members = members.split(',')
     description = req.get('description', None)
 
-    # Check for missing parameters
-    if group_name is None:
-        return jsonify(msg='Bad Request'), 400
+    # Create new group
+    result = MongoUtil.create_group(group_name, user, members, description)
 
-    new_group = MongoUtil.create_group(group_name, moderator, members, description)
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} created group'.format(user, new_group))
+    app.logger.info('User {} created group'.format(user, result))
 
-    return jsonify(JsonUtil.serialize(new_group)), 200
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/group/<string:group_id>/members', methods=['POST'])
@@ -135,26 +156,27 @@ def add_group_member(user, group_id):
             "Provider-Name": "Google"
         }
 
-    @apiParam {String} member_id: member ID
+    @apiParam {String} member_email: member's email
     @apiParamExample {json} Request (Example)
         {
-            "member_id": "58acbd42a80a5f"
+            "member_email": "test@ualbeta.ca"
         }
 
     @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
     """
     req = RequestUtil.get_request()
-    member_id = req.get('member')
+    member_email = req.get('member_email')
 
-    reading_group = MongoUtil.add_group_member(group_id, member_id)
+    result = MongoUtil.add_group_member(group_id, member_email)
 
-    # Check for valid group
-    if reading_group is None:
-        return jsonify(msg='Group does not exist.'), 400
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} add member {} to {}'.format(user, member_id, reading_group))
+    app.logger.info('User {} add member {} to {}'.format(user, member_email, result))
 
-    return jsonify(JsonUtil.serialize(reading_group)), 200
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/group/list/<string:list_id>/archive', methods=['DELETE'])

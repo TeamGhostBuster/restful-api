@@ -261,13 +261,19 @@ def create_group(group_name, moderator, members=None, description=None):
     Group.objects(id=new_group.id).update_one(push__members=moderator)
 
     # Add members if not null
-    if members is not None:
-        for id in members:
+    member_buffer = list()
+    if members:
+        for email in members:
             try:
-                member = User.objects.get(id=ObjectId(id))
-                Group.objects(id=new_group.id).update_one(push__members=member)
-            except DoesNotExist:
-                return None
+                user = User.objects.get(email=email)
+                member_buffer.append(user)
+            except Exception as e:
+                return type(e).__name__
+            finally:
+                # Even if exception occurs, still be able to add a portion of user
+                Group.objects(id=new_group.id).update_one(add_to_set__members=member_buffer)
+        # Bulk update
+        Group.objects(id=new_group.id).update_one(add_to_set__members=member_buffer)
 
     new_group.reload()
     return new_group
@@ -282,21 +288,17 @@ def find_group(group_id):
     return reading_group
 
 
-def add_group_member(group_id, member_id):
-    # Find the group
+def add_group_member(group_id, member_email):
     try:
+        # Find the group and user
         reading_group = find_group(group_id)
-    except DoesNotExist:
-        return None
-
-    # Check that new member exists
-    try:
-        new_member = User.objects.get(id=ObjectId(member_id))
-    except DoesNotExist:
-        return None
+        new_member = User.objects.get(email=member_email)
+        # Add user to group
+        Group.objects(id=ObjectId(group_id)).update_one(push__members=new_member)
+    except Exception as e:
+        return type(e).__name__
 
     # Add group member
-    Group.objects(id=ObjectId(group_id)).update_one(push__members=new_member)
     reading_group.reload()
 
     return reading_group
