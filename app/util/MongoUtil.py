@@ -134,6 +134,15 @@ def create_list(list_name, user):
     return new_list
 
 
+def rename_personal_list(user, list_id, new_name):
+    try:
+        # Rename the list
+        List.objects.get(id=ObjectId(list_id)).update_one(name=new_name)
+
+    except Exception as e:
+        return type(e).__name__
+
+
 def create_article(data, list_id):
     try:
         # Check if list exists

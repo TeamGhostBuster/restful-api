@@ -128,6 +128,41 @@ def create_list(user):
     return jsonify(JsonUtil.serialize(new_list)), 200
 
 
+@app.route('/user/list/<string:list_id>/rename', methods=['PUT'])
+@authorized_required
+def rename_personal_list(user, list_id):
+    """
+    @api {put} /user/list/:id/rename Rename personal list.
+    @apiName Rename personal list.
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+    
+    @apiParam {String} name The new name.
+    @apiParamExample {json} Request(Example)
+        {
+            "name": "New list name"
+        }
+
+    @apiSuccessExample {json} Response(Example)
+        {
+            "msg": "Success"
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    req = RequestUtil.get_request()
+    new_name = req.get('name', None)
+
+    result = MongoUtil.rename_personal_list(user, list_id, new_name)
+
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    return jsonify(msg='Success'), 200
+
+
 @app.route('/user/list/<string:list_id>/article/<string:article_id>', methods=['DELETE'])
 @authorized_required
 def delete_article(user, list_id, article_id):
