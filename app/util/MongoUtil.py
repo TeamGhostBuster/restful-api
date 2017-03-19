@@ -137,7 +137,8 @@ def create_list(list_name, user):
 def rename_personal_list(user, list_id, new_name):
     try:
         # Rename the list
-        List.objects.get(id=ObjectId(list_id)).update_one(name=new_name)
+        the_list = List.objects.get(id=ObjectId(list_id))
+        List.objects(id=the_list.id).update_one(name=new_name)
 
     except Exception as e:
         return type(e).__name__
