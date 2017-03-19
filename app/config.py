@@ -12,7 +12,6 @@ class BaseConfig(object):
 
     ELASTICSEARCH_SETTINGS = {
         'ELASTICSEARCH_HOST': ['localhost'],
-        'ELASTICSEARCH_AUTH': ('elastic', 'changeme'),
         'ELASTICSEARCH_PORT': 9200
     }
 
@@ -49,7 +48,6 @@ class DeployConfig(BaseConfig):
 
     ELASTICSEARCH_SETTINGS = {
         'ELASTICSEARCH_HOST': 'elasticsearch',
-        'ELASTICSEARCH_AUTH': ('elastic', 'changeme'),
         'ELASTICSEARCH_PORT': 9200
     }
 

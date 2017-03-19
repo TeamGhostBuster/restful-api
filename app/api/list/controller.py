@@ -452,7 +452,99 @@ def add_article_to_group_list(user, list_id):
     if (reading_list or new_vote_object) is None:
         return jsonify(msg="Bad request."), 400
 
-    app.logger.info("User {} add article {} to list {}".format(user, article_id, list_id))
-    app.logger.info("User {} created new vote object".format(user))
+    app.logger.info('User {} add article {} to list {}'.format(user, article_id, list_id))
+    app.logger.info('User {} created new vote object'.format(user))
 
     return jsonify(JsonUtil.serialize(reading_list)), 200
+
+
+@app.route('/user/list/<string:list_id>/partition', methods=['PUT'])
+@authorized_required
+def partition_user_list(user, list_id):
+    """
+    @api {put} /user/list/:id/partition Partition a user list.
+    @apiName Partition a user list.
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} name The new list name.
+    @apiParam {String[]} articles The id of articles to move.
+    @apiParamExample {json} Request (Example)
+        {
+            "name": "new list",
+            "articles": ["adlkjfal", "dsalkjfa]
+        }
+    
+    @apiSuccessExample {json} Response(Example)
+        {
+            "old_list": {
+                "id": "31ladsjfl",
+                "name": "CMPUT 391 Seminar",
+                "articles": [
+                    {
+                        "id": "adlfajdls",
+                        "title": "Process"
+                    }
+                ]
+            },
+            "new_list": {
+                "id": "31ladsjfl",
+                "name": "CMPUT 401 Seminar",
+                "articles": [
+                    {
+                        "id": "adskfa",
+                        "title": "Whatever Process"
+                    }
+                ]
+            }
+        }
+    
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    req = RequestUtil.get_request()
+    list_name = req.get('name', None)
+    articles = req.get('articles', None)
+
+    # Partition list
+    result = MongoUtil.partition_user_list(user, list_id, list_name, articles)
+
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    return jsonify({'old_list': JsonUtil.serialize(result[0]),
+                    'new_list': JsonUtil.serialize(result[1])}), 200
+
+
+@app.route('/user/list/<string:list_id>/article/<string:article_id>/move/list/<string:new_list_id>', methods=['PUT'])
+@authorized_required
+def move_article_in_user_list(user, list_id, article_id, new_list_id):
+    """
+    @api {put} /user/list/:id/article/:id/move/list/:id Move article to another user list.
+    @apiName Move article to another user list.
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiSuccessExample {json} Response(Example)
+        {
+            "msg": "Success"
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    # Move article
+    result = MongoUtil.move_article_to_user_list(user, list_id, article_id, new_list_id)
+
+    # If error occurs
+    if isinstance(result, str):
+        app.logger.debug(result)
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} Move {} from list {} to list {}'.format(
+        user, result, list_id, new_list_id
+    ))
+
+    return jsonify(msg='Success'), 200

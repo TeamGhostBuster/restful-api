@@ -32,7 +32,6 @@ CORS(app)
 es_config = app.config['ELASTICSEARCH_SETTINGS']
 es = Elasticsearch(
     es_config['ELASTICSEARCH_HOST'],
-    http_auth=es_config['ELASTICSEARCH_AUTH'],
     port=es_config['ELASTICSEARCH_PORT']
 )
 

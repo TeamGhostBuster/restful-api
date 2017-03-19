@@ -461,3 +461,40 @@ def add_vote_count(group_list):
         group_list['articles'][i]['vote_count'] = get_vote_count(group_list['id'], article['id'])
 
     return group_list
+
+
+def partition_user_list(user, old_list_id, new_list_name, articles):
+    try:
+        # Get list and create new list
+        old_list = List.objects.get(id=ObjectId(old_list_id))
+        new_list = create_list(new_list_name, user)
+
+        article_buffer = list()
+        for a in articles:
+            article_buffer.append(Article.objects.get(id=ObjectId(a)))
+
+        # Add selected article into new list and remove from old list
+        List.objects(id=new_list.id).update_one(add_to_set__articles=article_buffer)
+        List.objects(id=old_list.id).update_one(pull_all__articles=article_buffer)
+    except Exception as e:
+        print(type(e).__name__)
+        return type(e).__name__
+
+    old_list.reload()
+    new_list.reload()
+    return old_list, new_list
+
+
+def move_article_to_user_list(user, list_id, article_id, new_list_id):
+    try:
+        # Get article and lists
+        article = Article.objects.get(id=ObjectId(article_id))
+        list1 = List.objects.get(Q(id=ObjectId(list_id)) & Q(articles=article))
+        list2 = List.objects.get(id=ObjectId(new_list_id))
+        # Update article list
+        List.objects(id=list1.id).update_one(pull__articles=article)
+        List.objects(id=list2.id).update_one(push__articles=article)
+    except Exception as e:
+        return type(e).__name__
+
+    return article
