@@ -33,8 +33,6 @@ def get_auth_info():
             result = requests.get(url).json()
             if result.get('error_description') is not None:
                 return None
-            elif result['aud'] != BaseConfig.CONFIG['google']['client_key']:
-                return None
 
             user = MongoUtil.find_user(result['email'])
 

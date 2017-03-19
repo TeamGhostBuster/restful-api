@@ -485,16 +485,24 @@ def partition_user_list(user, old_list_id, new_list_name, articles):
     return old_list, new_list
 
 
-def move_article_to_user_list(user, list_id, article_id, new_list_id):
+def copy_article_to_user_list(user, base_list_id, article_id, target_list_id):
     try:
         # Get article and lists
         article = Article.objects.get(id=ObjectId(article_id))
-        list1 = List.objects.get(Q(id=ObjectId(list_id)) & Q(articles=article))
-        list2 = List.objects.get(id=ObjectId(new_list_id))
-        # Update article list
-        List.objects(id=list1.id).update_one(pull__articles=article)
+        list1 = List.objects.get(Q(id=ObjectId(base_list_id)) & Q(articles=article))
+        list2 = List.objects.get(id=ObjectId(target_list_id))
+        # Update articles list
         List.objects(id=list2.id).update_one(push__articles=article)
     except Exception as e:
         return type(e).__name__
 
-    return article
+
+def merge_user_ist(user, base_list_id, target_list_id):
+    try:
+        base_list = List.objects.get(id=ObjectId(base_list_id))
+        target_list = List.objects.get(id=ObjectId(target_list_id))
+
+        List.objects(id=target_list.id).update_one(add_to_set__articles=base_list.articles)
+        List.objects(id=base_list.id).delete()
+    except Exception as e:
+        return type(e).__name__

@@ -473,7 +473,7 @@ def partition_user_list(user, list_id):
     @apiParamExample {json} Request (Example)
         {
             "name": "new list",
-            "articles": ["adlkjfal", "dsalkjfa]
+            "articles": ["adlkjfal", "dsalkjfa"]
         }
     
     @apiSuccessExample {json} Response(Example)
@@ -517,12 +517,12 @@ def partition_user_list(user, list_id):
                     'new_list': JsonUtil.serialize(result[1])}), 200
 
 
-@app.route('/user/list/<string:list_id>/article/<string:article_id>/move/list/<string:new_list_id>', methods=['PUT'])
+@app.route('/user/list/<base_list_id>/article/<string:article_id>/copy/list/<target_list_id>', methods=['PUT'])
 @authorized_required
-def move_article_in_user_list(user, list_id, article_id, new_list_id):
+def copy_article_in_user_list(user, base_list_id, article_id, target_list_id):
     """
-    @api {put} /user/list/:id/article/:id/move/list/:id Move article to another user list.
-    @apiName Move article to another user list.
+    @api {put} /user/list/:base_list_id/article/:id/copy/list/:target_list_id Copy article to another user list.
+    @apiName Copy article to another user list.
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
@@ -535,16 +535,47 @@ def move_article_in_user_list(user, list_id, article_id, new_list_id):
     @apiUse UnauthorizedAccessError
     @apiUse ResourceDoesNotExist
     """
-    # Move article
-    result = MongoUtil.move_article_to_user_list(user, list_id, article_id, new_list_id)
+    # Copy article
+    result = MongoUtil.copy_article_to_user_list(user, base_list_id, article_id, target_list_id)
 
     # If error occurs
     if isinstance(result, str):
         app.logger.debug(result)
         return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} Move {} from list {} to list {}'.format(
-        user, result, list_id, new_list_id
+    app.logger.info('User {} Copy {} from list {} to list {}'.format(
+        user, result, base_list_id, target_list_id
     ))
+
+    return jsonify(msg='Success'), 200
+
+
+@app.route('/user/list/<string:base_list_id>/merge/list/<string:target_list_id>', methods=['PUT'])
+@authorized_required
+def merge_user_list(user, base_list_id, target_list_id):
+    """
+    @api {put} /user/list/:base_list_id/merge/list/:target_list_id Merge two personal lists.
+    @apiName Merge two personal lists.
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiSuccessExample {json} Response(Example)
+        {
+            "msg": "Success"
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    # Merge lists
+    result = MongoUtil.merge_user_ist(user, base_list_id, target_list_id)
+
+    # If error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} merge list {} into list {}'.format(
+        user, base_list_id, target_list_id))
 
     return jsonify(msg='Success'), 200
