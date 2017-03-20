@@ -81,6 +81,9 @@ def bulk_retrieve_list(user, lists):
         bulk_list = List.objects.in_bulk([ObjectId(i) for i in lists]).values()
         bulk_ops = list()
 
+        # URL: http://stackoverflow.com/questions/30943076/mongoengine-bulk-update-without-objects-update
+        # Author: lucasdavid
+
         # Bulk update retrieve list
         for each in bulk_list:
             bulk_ops.append(UpdateOne({'_id': each.id}, {'$set': {'archived': False}}))
