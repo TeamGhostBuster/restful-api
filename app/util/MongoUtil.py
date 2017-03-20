@@ -358,18 +358,18 @@ def check_user_in_group(user, group_id):
 
 def share_list_to_group(user, list_id, group_id):
     try:
+        list_buffer = list()
         # Check if the list exist
-        the_list = List.objects.get(id=ObjectId(list_id))
-        # Check if user has permission to the list or not
-        User.objects.get(id=user.id, lists=the_list)
-    except DoesNotExist:
-        return None
+        for l in list_id:
+            duplicate_list = deepcopy(List.objects.get(id=ObjectId(l)))
+            duplicate_list.id = None
+            duplicate_list.save()
+            list_buffer.append(duplicate_list)
 
-    duplicate_list = deepcopy(the_list)
-    duplicate_list.id = None
-    duplicate_list.save()
-    Group.objects(id=ObjectId(group_id)).update_one(push__lists=duplicate_list)
-    return duplicate_list
+        # Add list into the group
+        Group.objects(id=ObjectId(group_id)).update_one(add_to_set__lists=list_buffer)
+    except Exception as e:
+        return type(e).__name__
 
 
 def check_vote_exist(list, article):
