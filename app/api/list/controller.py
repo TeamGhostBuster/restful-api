@@ -333,7 +333,7 @@ def bulk_retrieve_list(user):
         return ResponseUtil.error_response(result)
 
     app.logger.info('User {} Retrieve List {}'.format(user, lists))
-
+    user.reload()
     return jsonify(JsonUtil.serialize(user))
 
 

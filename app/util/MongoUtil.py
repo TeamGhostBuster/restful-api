@@ -83,11 +83,12 @@ def bulk_retrieve_list(user, lists):
 
         # URL: http://stackoverflow.com/questions/30943076/mongoengine-bulk-update-without-objects-update
         # Author: lucasdavid
-
         # Bulk update retrieve list
         for each in bulk_list:
             bulk_ops.append(UpdateOne({'_id': each.id}, {'$set': {'archived': False}}))
 
+        # Execute
+        collection = List._get_collection().bulk_write(bulk_ops, ordered=False)
     except Exception as e:
         return type(e).__name__
 
