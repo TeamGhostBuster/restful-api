@@ -3,6 +3,7 @@ from copy import deepcopy
 from bson.objectid import ObjectId
 from flask_mongoengine import DoesNotExist
 from mongoengine.queryset.visitor import Q
+from pymongo import UpdateOne
 
 from app.api.article.model import Article
 from app.api.comment.model import Comment
@@ -73,6 +74,19 @@ def retrieve_list(user, list_id):
     user.reload()
 
     return user
+
+
+def bulk_retrieve_list(user, lists):
+    try:
+        bulk_list = List.objects.in_bulk([ObjectId(i) for i in lists]).values()
+        bulk_ops = list()
+
+        # Bulk update retrieve list
+        for each in bulk_list:
+            bulk_ops.append(UpdateOne({'_id': each.id}, {'$set': {'archived': False}}))
+
+    except Exception as e:
+        return type(e).__name__
 
 
 def archive_group_list(group_id, list_id):
