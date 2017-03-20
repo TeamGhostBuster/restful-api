@@ -299,6 +299,44 @@ def retrieve_list(user, list_id):
     return jsonify(JsonUtil.serialize(user))
 
 
+@app.route('/user/lists/retrieve', methods=['PUT'])
+@authorized_required
+def bulk_retrieve_list(user):
+    """
+    @api {put} /user/list/retrieve Bulk retrieve lists
+    @apiName Bulk retrieve lists
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParamExample {json} Request(Example)
+        {
+            "lists": ["aldskfj", "dasklf"]
+        }
+    
+    @apiSuccessExample {json} Response (Example):
+        {
+            "msg": "Success"
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    req = RequestUtil.get_request()
+    lists = req.get('lists', None)
+
+    result = MongoUtil.bulk_retrieve_list(user, lists)
+
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} Retrieve List {}'.format(user, lists))
+
+    return jsonify(JsonUtil.serialize(user))
+
+
 @app.route('/user/lists', methods=['GET'])
 @authorized_required
 def get_user_reading_lists(user):

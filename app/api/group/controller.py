@@ -292,3 +292,41 @@ def retrieve_group_list(user, list_id):
 
     app.logger.info('User {} Retrieve List ID: {} in Group '.format(user, list_id, group))
     return jsonify(JsonUtil.serialize(group, only=('id', 'name', 'description', 'lists')))
+
+
+@app.route('/group/:id/lists/retrieve', methods=['PUT'])
+@authorized_required
+def bulk_retrieve_group_list(user):
+    """
+    @api {put} /group/:id/lists/retrieve Bulk retrieve group lists
+    @apiName Bulk retrieve group lists
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParamExample {json} Request(Example)
+        {
+            "lists": ["aldskfj", "dasklf"]
+        }
+
+    @apiSuccessExample {json} Response (Example):
+        {
+            "msg": "Success"
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    req = RequestUtil.get_request()
+    lists = req.get('lists', None)
+
+    result = MongoUtil.bulk_retrieve_list(user, lists)
+
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} Retrieve Group List {}'.format(user, lists))
+
+    return jsonify(msg='Success'), 200
