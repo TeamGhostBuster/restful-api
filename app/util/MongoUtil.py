@@ -10,6 +10,7 @@ from app.api.group.model import Group
 from app.api.list.model import List
 from app.api.user.model import User
 from app.api.vote.model import Vote
+from app.api.invitation.model import Invitation
 
 from app.exception.UserHasVoted import UserHasVoted
 
@@ -520,3 +521,53 @@ def merge_user_ist(user, base_list_id, target_list_id):
         List.objects(id=base_list.id).delete()
     except Exception as e:
         return type(e).__name__
+
+
+def invite_user(inviter, invitee_email, group_id):
+    try:
+        # Create new invitation object
+        invitee = User.objects.get(email=invitee_email)
+        group = Group.objects.get(id=ObjectId(group_id))
+        invitation = Invitation(invitee=invitee, inviter=inviter, group=group).save()
+
+    except Exception as e:
+        return type(e).__name__
+
+    return invitation
+
+
+def get_user_pending_invitation(user):
+    try:
+        # Retrive all user pending invitaiton
+        pending_invitations = Invitation.objects(invitee=user)
+    except Exception as e:
+        return type(e).__name__
+
+    return pending_invitations
+
+
+def accept_invitation(user, invitation_id):
+    try:
+        # Accept invitation
+        invitation = Invitation.objects.get(id=ObjectId(invitation_id))
+        if user != invitation.invitee:
+            raise ValueError
+        Group.objects(id=invitation.group.id).update_one(push__members=user)
+        Invitation.objects(id=invitation.id).delete()
+    except Exception as e:
+        return type(e).__name__
+
+    return invitation
+
+
+def deny_invitation(user, invitation_id):
+    try:
+        # Accept invitation
+        invitation = Invitation.objects.get(id=ObjectId(invitation_id))
+        if user != invitation.invitee:
+            raise ValueError
+        Invitation.objects(id=invitation.id).delete()
+    except Exception as e:
+        return type(e).__name__
+
+    return invitation

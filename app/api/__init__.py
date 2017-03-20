@@ -11,6 +11,8 @@ from .user import controller as user_api
 from .user import model as user_model
 from .vote import controller as vote_api
 from .vote import model as vote_model
+from .invitation import controller as invitation_api
+from .invitation import model as invitation_model
 
 # APIDOC Inherit Doc
 
