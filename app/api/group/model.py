@@ -1,3 +1,4 @@
+import mongoengine
 from marshmallow import Schema, fields
 
 from app import db
@@ -9,7 +10,7 @@ class Group(db.Document):
     name = db.StringField(required=True)
     description = db.StringField()
     moderator = db.ReferenceField(User, required=True)
-    lists = db.ListField(db.ReferenceField(List))
+    lists = db.ListField(db.ReferenceField(List, reverse_delete_rule=mongoengine.PULL))
     members = db.ListField(db.ReferenceField(User))
 
     def __str__(self):
