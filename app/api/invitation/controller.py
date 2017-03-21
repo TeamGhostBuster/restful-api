@@ -12,10 +12,10 @@ def invite_user_to_group(user, group_id):
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} user_email Invitee's email.
+    @apiParam {String[]} user_email A list of invitees' email.
     @apiParamExample {json} Request(Example)
         {
-            "email": "invitee@ualberta.ca"
+            "email": ["invitee@ualberta.ca", "invitee2@ualberta.ca"]
         }
 
     @apiSuccessExample {json} Response (Example):
@@ -24,6 +24,7 @@ def invite_user_to_group(user, group_id):
         }
 
     @apiUse UnauthorizedAccessError
+    @apiUse UserHasInvited
     """
     app.logger.info('User {} Access {}'.format(user, request.full_path))
 

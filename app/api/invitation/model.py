@@ -7,7 +7,7 @@ from marshmallow import Schema, fields
 
 class Invitation(db.Document):
     inviter = db.ReferenceField(User, required=True)
-    invitee = db.ReferenceField(User, required=True)
+    invitee = db.ReferenceField(User, required=True, unique_with=['inviter', 'group'])
     group = db.ReferenceField(Group, required=True)
 
 

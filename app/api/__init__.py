@@ -117,3 +117,12 @@ apiError UserNotInGroup The user is not in any group
         "msg": "User cannot vote twice"
     }
 """
+
+"""
+@apiDefine UserHasInvited
+@apiError UserHasInvited User has been invited
+@apiErrorExample Error 403
+    {
+        "msg": "UUser cannot send invitation twice"
+    }
+"""
