@@ -541,17 +541,17 @@ def merge_user_ist(user, base_list_id, target_list_id):
         return type(e).__name__
 
 
-def invite_user(inviter, invitee_email, group_id):
+def invite_user(inviter, invitees_email, group_id):
     try:
         # Create new invitation object
-        invitee = User.objects.get(email=invitee_email)
         group = Group.objects.get(id=ObjectId(group_id))
-        invitation = Invitation(invitee=invitee, inviter=inviter, group=group).save()
+        for invitee_email in invitees_email:
+            if invitee_email != inviter.email:
+                invitee = User.objects.get(email=invitee_email)
+                Invitation(invitee=invitee, inviter=inviter, group=group).save()
 
     except Exception as e:
         return type(e).__name__
-
-    return invitation
 
 
 def get_user_pending_invitation(user):
