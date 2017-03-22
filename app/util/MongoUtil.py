@@ -524,6 +524,7 @@ def copy_article_to_user_list(user, base_list_id, article_id, target_list_id):
         article = Article.objects.get(id=ObjectId(article_id))
         list1 = List.objects.get(Q(id=ObjectId(base_list_id)) & Q(articles=article))
         list2 = List.objects.get(id=ObjectId(target_list_id))
+        Vote(article=article, list=list2).save()
         # Update articles list
         List.objects(id=list2.id).update_one(push__articles=article)
     except Exception as e:
