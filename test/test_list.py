@@ -13,6 +13,12 @@ def test_create_user_list(result=None):
 
 
 @pytest.mark.run(after='test_create_user_list')
+@put('/user/list/{}/rename', {"name": "Rename Test List"})
+def test_rename_list(result=None, url_id=['list_id']):
+    assert result.status_code == 200
+
+
+@pytest.mark.run(after='test_create_user_list')
 @delete('/user/list/{}/archive')
 def test_archive_user_list(result=None, url_id=['list_id']):
     assert result.status_code == 200

@@ -142,7 +142,7 @@ def put(url, data=None):
                 json_ids = [global_id[i] for i in f.__defaults__[2]]
                 result = requests.put(base_url + url.format(*url_ids),
                                       headers=headers,
-                                      json=json.loads(data.format(*json_ids))[0])
+                                      json=json.loads(data.format(*json_ids)))
             else:
                 result = requests.put(base_url + url,
                                       headers=headers,
