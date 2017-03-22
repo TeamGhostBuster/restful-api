@@ -259,6 +259,8 @@ def delete_article(user, list_id, article_id):
         the_list = List.objects.get(Q(id=ObjectId(list_id)) & Q(articles=the_article))
         # Remove the article from the list
         List.objects(id=the_list.id).update_one(pull__articles=the_article)
+        # Remove the vote as well
+        Vote.objects(article=the_article, list=the_list).delete()
     except Exception as e:
         return type(e).__name__
 
