@@ -1,16 +1,15 @@
 version: '2'
 services:
-    flaskapp-test:
+    flaskapp-frontend:
         build: .
-        container_name: flaskapp-test
+        container_name: flaskapp-frontend
         networks:
             - esnet
-        ports:
-            - 7000:80
         environment:
-            - FLASK_CONFIGURATION=test
+            - FLASK_CONFIGURATION=frontend
             - debug:debug1
-            - API_URL=http://localhost:80
+        ports:
+            - 10000:80
         restart: always
         external_links:
             - mongo

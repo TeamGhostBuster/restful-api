@@ -12,7 +12,8 @@ config = {
     'prod': 'app.config.ProductionConfig',
     'deploy': 'app.config.DeployConfig',
     'dev': 'app.config.DevelopmentConfig',
-    'test': 'app.config.TestConfig'
+    'test': 'app.config.TestConfig',
+    'frontend': 'app.config.FronEndTestConfig'
 }
 
 # initialize flask instance

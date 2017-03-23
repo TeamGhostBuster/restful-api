@@ -65,3 +65,13 @@ class TestConfig(BaseConfig):
         'replicaset': 'mongo-replica',
         'READ_PREFERENCE': ReadPreference.SECONDARY
     }
+
+class FronEndTestConfig(BaseConfig):
+    DEBUG = True
+
+    MONGODB_SETTINGS = {
+        'HOST': 'mongodb://mongo,mongo1,mongo2/raspberry-test2',
+        'PORT': 27017,
+        'replicaset': 'mongo-replica',
+        'READ_PREFERENCE': ReadPreference.SECONDARY
+    }
