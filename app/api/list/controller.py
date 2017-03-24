@@ -518,7 +518,7 @@ def add_article_to_group_list(user, group_id, list_id):
     req = RequestUtil.get_request()
     article_id = req.get('article_id', None)
 
-    result = MongoUtil.add_article_to_group_list(list_id, article_id)
+    result = MongoUtil.add_article_to_group_list(group_id, list_id, article_id)
 
     # Check for valid request
     if isinstance(result, str):
