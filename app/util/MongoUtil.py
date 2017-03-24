@@ -238,6 +238,23 @@ def add_article_to_list(list_id, article_id):
     return reading_list
 
 
+def add_article_to_group_list(group_id, list_id, article_id):
+    # Find the article
+    try:
+        article = find_article(article_id)
+        reading_list = find_list(list_id)
+        # Add the article to the list
+        List.objects(id=ObjectId(list_id)).update_one(push__articles=article)
+        # Init the vote object
+        Vote(article=article, list=reading_list)
+    except Exception as e:
+        return type(e).__name__
+
+    reading_list.reload()
+
+    return reading_list
+
+
 def add_tag(article_id, tag):
     try:
         article = Article.objects.get(id=ObjectId(article_id))

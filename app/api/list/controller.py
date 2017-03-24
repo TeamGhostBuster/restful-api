@@ -516,17 +516,17 @@ def add_article_to_group_list(user, group_id, list_id):
 
     # Get parameters
     req = RequestUtil.get_request()
-    article_id = req['article_id']
+    article_id = req.get('article_id', None)
 
-    reading_list = MongoUtil.add_article_to_list(list_id, article_id)
+    result = MongoUtil.add_article_to_group_list(list_id, article_id)
 
     # Check for valid request
-    if reading_list is None:
-        return jsonify(msg="Bad request."), 400
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
 
     app.logger.info('User {} add article {} to list {} in Group'.format(user, article_id, list_id))
 
-    return jsonify(JsonUtil.serialize(reading_list)), 200
+    return jsonify(JsonUtil.serialize(result)), 200
 
 
 @app.route('/user/list/<string:list_id>/partition', methods=['PUT'])
