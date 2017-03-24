@@ -494,17 +494,17 @@ def add_article_to_user_list(user, list_id):
     return jsonify(JsonUtil.serialize(reading_list)), 200
 
 
-@app.route('/group/list/<string:list_id>/articles', methods=['POST'])
-@group_read_permission_required
-def add_article_to_group_list(user, list_id):
+@app.route('/group/<string:group_id>/list/<string:list_id>/articles', methods=['POST'])
+@authorized_required
+def add_article_to_group_list(user, group_id, list_id):
     """
-    @api {post} /group/list/:id/articles Add article to a group's list
-    @apiName Copy article to group list
+    @api {post} /group/:id/list/:id/articles Add article to a group's list
+    @apiName Add article to group list
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
 
-    @apiParam {String} id: Article id.
+    @apiParam {String} article_id: Article id.
     @apiParamExample {json} Request (Example)
         {
             "article_id": "834jlkkasd9"
@@ -519,14 +519,12 @@ def add_article_to_group_list(user, list_id):
     article_id = req['article']
 
     reading_list = MongoUtil.add_article_to_list(list_id, article_id)
-    new_vote_object = MongoUtil.create_vote_object(list_id, article_id)
 
     # Check for valid request
-    if (reading_list or new_vote_object) is None:
+    if reading_list is None:
         return jsonify(msg="Bad request."), 400
 
-    app.logger.info('User {} add article {} to list {}'.format(user, article_id, list_id))
-    app.logger.info('User {} created new vote object'.format(user))
+    app.logger.info('User {} add article {} to list {} in Group'.format(user, article_id, list_id))
 
     return jsonify(JsonUtil.serialize(reading_list)), 200
 
