@@ -11,3 +11,6 @@ def save_to_es(article):
     doc = JsonUtil.serialize(article)
     es.index(index='raspberry', doc_type='article', id=article.id, body=doc)
 
+
+def remove_from_es(article_id):
+    es.delete(index='raspberry', doc_type='article', id=article_id)

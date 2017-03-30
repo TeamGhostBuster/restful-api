@@ -194,7 +194,7 @@ def create_article_in_group(user, group_id, list_id):
     req = RequestUtil.get_request()
 
     # Create new article
-    result = MongoUtil.create_article_in_group(req, list_id, group_id)
+    result = MongoUtil.create_article_in_group(user, req, list_id, group_id)
 
     if isinstance(result, str):
         return ResponseUtil.error_response(result)

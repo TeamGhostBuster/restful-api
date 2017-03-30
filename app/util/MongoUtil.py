@@ -191,14 +191,14 @@ def update_article(data, article_id):
     return article
 
 
-def create_article_in_group(data, list_id, group_id):
+def create_article_in_group(user, data, list_id, group_id):
     try:
         # Check if the list exist
         the_list = List.objects.get(id=ObjectId(list_id))
         # Check if the list belongs to the group
         the_group = Group.objects.get(Q(id=ObjectId(group_id)) & Q(lists=the_list))
         # create new article
-        new_article = create_article(data, list_id)
+        new_article = create_article(user, data, list_id)
         # init the vote
         Vote(article=new_article, list=the_list).save()
     except Exception as e:
@@ -583,13 +583,16 @@ def invite_user(inviter, invitees_email, group_id):
     try:
         # Create new invitation object
         group = Group.objects.get(id=ObjectId(group_id))
+        invitations = list()
         for invitee_email in invitees_email:
             if invitee_email != inviter.email:
                 invitee = User.objects.get(email=invitee_email)
-                Invitation(invitee=invitee, inviter=inviter, group=group).save()
+                invitations.append(Invitation(invitee=invitee, inviter=inviter, group=group).save())
 
     except Exception as e:
         return type(e).__name__
+
+    return invitations
 
 
 def get_user_pending_invitation(user):

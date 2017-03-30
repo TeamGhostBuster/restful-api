@@ -1,5 +1,6 @@
 from app.util import JsonUtil, RequestUtil, ResponseUtil, MongoUtil
 from app.util.AuthUtil import *
+from app.util.OneSignalUtil import OneSignal
 
 
 @app.route('/group/<string:group_id>/invite', methods=['POST'])
@@ -37,6 +38,10 @@ def invite_user_to_group(user, group_id):
     # If error occurs
     if isinstance(result, str):
         return ResponseUtil.error_response(result)
+
+    one_signal = OneSignal()
+
+    one_signal.create_invitation_notification(result)
 
     app.logger.info('User {} invite {} to Group {}'.format(user, email, group_id))
 
@@ -111,7 +116,7 @@ def accept_invitation(user, invitation_id):
     if isinstance(result, str):
         return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} accept invitation to Group {}'.format(user, result.group))
+    app.logger.info('User {} accept invitatin to Group {}'.format(user, result.group))
 
     return jsonify(msg='Success accepts invitation'), 200
 

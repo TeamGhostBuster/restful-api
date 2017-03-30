@@ -31,6 +31,11 @@ class BaseConfig(object):
         'hliu11': 'hliu11@ualberta.ca'
     }
 
+    ONE_SIGNAL_SETTINGS = {
+        'APP_ID': '0f44bda8-4f00-43c3-a035-344371882153',
+        'API_KEY': 'M2NhNDU0MWUtZDUzMC00NzkyLWJhZGUtZWYyNjA1NTAyOWMx'
+    }
+
 
 class ProductionConfig(BaseConfig):
     DEBUG = False

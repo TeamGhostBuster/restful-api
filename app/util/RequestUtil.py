@@ -32,8 +32,8 @@ def get_auth_info():
                    % access_token)
             result = requests.get(url).json()
             if result.get('error_description') is not None:
+                app.logger.debug('User {} failed to access the server'.format(access_token))
                 return None
-
             user = MongoUtil.find_user(result['email'])
 
     if user is None:

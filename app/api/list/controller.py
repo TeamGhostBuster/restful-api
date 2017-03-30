@@ -1,4 +1,4 @@
-from app.util import JsonUtil, MongoUtil, RequestUtil, ResponseUtil
+from app.util import JsonUtil, MongoUtil, RequestUtil, ResponseUtil, ElasticSearchUtil
 from app.util.AuthUtil import *
 
 
@@ -212,6 +212,9 @@ def delete_article(user, list_id, article_id):
     # if error occurs
     if isinstance(result, str):
         return ResponseUtil.error_response(result)
+
+    # Remove from elasticsearch as well
+    ElasticSearchUtil.remove_from_es(article_id)
 
     app.logger.info('User {} delete article {} from list {}'.format(user, article_id, list_id))
 
