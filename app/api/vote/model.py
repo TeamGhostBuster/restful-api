@@ -1,3 +1,5 @@
+import mongoengine
+
 from app import db
 from marshmallow import Schema, fields
 from app.api.article.model import Article, ArticleSchema

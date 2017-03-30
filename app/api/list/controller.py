@@ -26,7 +26,11 @@ def get_articles_from_list(user, list_id):
             "articles": [
                 {
                     "id": "adlfajdls",
-                    "title": "Process"
+                    "title": "Process",
+                    "creator": {
+                        "email": "whatevr@ualberta.ca",
+                        "id": "adslakdfs"
+                    }
                 }
             ]
         }
@@ -70,7 +74,11 @@ def get_articles_from_group_list(user, group_id, list_id):
                 {
                     "id": "adlfajdls",
                     "title": "Process",
-                    "vote_count": 1
+                    "vote_count": 1,
+                    "creator": {
+                        "email": "whatevr@ualberta.ca",
+                        "id": "adslakdfs"
+                    }
                 }
             ]
         }
@@ -167,8 +175,8 @@ def rename_personal_list(user, list_id):
 @authorized_required
 def delete_article(user, list_id, article_id):
     """
-    @api {delete} /user/list/:list_id/article/:article_id Delete an article
-    @apiName Delete an article from a list
+    @api {delete} /user/list/:list_id/article/:article_id Permanently delete an article
+    @apiName Permanently delete an article from a list
     @apiGroup List
 
     @apiUse AuthorizationTokenHeader
@@ -193,7 +201,6 @@ def delete_article(user, list_id, article_id):
             ]
         }
 
-
     @apiUse UnauthorizedAccessError
     @apiUse ResourceDoesNotExist
     """
@@ -206,7 +213,54 @@ def delete_article(user, list_id, article_id):
     if isinstance(result, str):
         return ResponseUtil.error_response(result)
 
-    app.logger.info('User {} Delete article {} From list {}'.format(user, article_id, list_id))
+    app.logger.info('User {} delete article {} from list {}'.format(user, article_id, list_id))
+
+    return jsonify(JsonUtil.serialize(result)), 200
+
+
+@app.route('/usr/list/<string:list_id>/article/<string:article_id>/archive', methods=['DELETE'])
+@authorized_required
+def archive_article(user, list_id, article_id):
+    """
+    @api {delete} /user/list/:list_id/article/:article_id/archive Remove an article from list
+    @apiName Remove an article from a list
+    @apiGroup List
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiParam {String} list_id The list id.
+    @apiParam {String} article_id The article id.
+
+    @apiSuccess {String} List id.
+    @apiSuccess {String} List name.
+    @apiSuccess {Object[]} articles Articles data.
+    @apiSuccess {String} articles.id Article id.
+    @apiSuccess {String} article.title Article title.
+    @apiSuccessExample {json} Response (Example):
+        {
+            "id": "31ladsjfl",
+            "name": "CMPUT 391 Seminar",
+            "articles": [
+                {
+                    "id": "adlfajdls",
+                    "title": "Process"
+                }
+            ]
+        }
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    # Delete the article from the list
+    result = MongoUtil.archive_article(user, list_id, article_id)
+
+    # if error occurs
+    if isinstance(result, str):
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} remove article {} from list {}'.format(user, article_id, list_id))
 
     return jsonify(JsonUtil.serialize(result)), 200
 

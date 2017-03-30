@@ -163,12 +163,12 @@ def rename_personal_list(user, list_id, new_name):
         return type(e).__name__
 
 
-def create_article(data, list_id):
+def create_article(user, data, list_id):
     try:
         # Check if list exists
         List.objects.get(id=ObjectId(list_id))
         # Create new article
-        new_article = Article(**data).save()
+        new_article = Article(**data, creator=user).save()
     except Exception as e:
         return type(e).__name__
 
@@ -269,6 +269,24 @@ def add_tag(article_id, tag):
 
 
 def delete_article(user, list_id, article_id):
+    # Retrieve the articled and list to be deleted
+    try:
+        # Check resource
+        the_article = Article.objects.get(id=ObjectId(article_id))
+        the_list = List.objects.get(Q(id=ObjectId(list_id)) & Q(articles=the_article))
+        # Remove the article from the database
+        Article.objects(id=the_article.id).delete()
+        # Remove the vote as well
+        Vote.objects(article=the_article, list=the_list).delete()
+    except Exception as e:
+        return type(e).__name__
+
+    the_list.reload()
+
+    return the_list
+
+
+def archive_article(user, list_id, article_id):
     # Retrieve the articled and list to be deleted
     try:
         # Check resource

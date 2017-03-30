@@ -91,7 +91,7 @@ def create_article(user, list_id):
     req = RequestUtil.get_request()
 
     # Create article
-    result = MongoUtil.create_article(req, list_id)
+    result = MongoUtil.create_article(user, req, list_id)
 
     # If error occurs
     if isinstance(result, str):
