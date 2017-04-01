@@ -8,7 +8,7 @@ def share_list_to_group(user):
     """
     @api {post} /share/list Share list to multiple groups.
     @apiName Share list to multiple groups.
-    @apiGroup Group
+    @apiGroup Share
 
     @apiUse AuthorizationTokenHeader
 
@@ -41,3 +41,28 @@ def share_list_to_group(user):
     app.logger.info('User {} Share list {} to Group {}'.format(user, list_id, group_id))
 
     return jsonify(msg='Success'), 200
+
+
+@app.route('/user/list/<string:base_list_id>/article/<string:article_id>/share/group/<string:group_id>/list'
+           '/<target_list_id>', methods=['POST'])
+@authorized_required
+def share_article_to_group(user, base_list_id, article_id, group_id, target_list_id):
+    """
+    @api {post} /user/list/:id/article/:id/share/group/:id/list/:id Share a article to group list.
+    @apiName Share a article into a group list.
+    @apiGroup Share
+
+    @apiUse AuthorizationTokenHeader
+
+    @apiUse UnauthorizedAccessError
+    @apiUse ResourceDoesNotExist
+    """
+    app.logger.info('User {} Access {}'.format(user, request.full_path))
+
+    result = MongoUtil.share_article_to_group_list(user, base_list_id, article_id, group_id, target_list_id)
+
+    if isinstance(result, str):
+        app.logger.debug(result)
+        return ResponseUtil.error_response(result)
+
+    app.logger.info('User {} share article {} to group {}'.format(user, article_id, group_id))

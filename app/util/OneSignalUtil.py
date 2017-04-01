@@ -14,6 +14,7 @@ class OneSignal:
         target_users = list()
         for each in invitations:
             target_users.append({'field': 'tag', 'key': 'email', 'relation': '=', 'value': each.invitee.email})
+            target_users.append({'operator': 'OR'})
 
         payload = {
             'app_id': app.config['ONE_SIGNAL_SETTINGS']['API_ID'],
