@@ -221,7 +221,7 @@ def delete_article(user, list_id, article_id):
     return jsonify(JsonUtil.serialize(result)), 200
 
 
-@app.route('/usr/list/<string:list_id>/article/<string:article_id>/archive', methods=['DELETE'])
+@app.route('/user/list/<string:list_id>/article/<string:article_id>/archive', methods=['DELETE'])
 @authorized_required
 def archive_article(user, list_id, article_id):
     """
@@ -649,7 +649,7 @@ def partition_user_list(user, list_id):
 @authorized_required
 def copy_article_in_user_list(user, base_list_id, article_id, target_list_id):
     """
-    @api {put} /user/list/:base_list_id/article/:id/copy/list/:target_list_id Copy article to another user list.
+    @api {post} /user/list/:base_list_id/article/:id/copy/list/:target_list_id Copy article to another user list.
     @apiName Copy article to another user list.
     @apiGroup List
 
