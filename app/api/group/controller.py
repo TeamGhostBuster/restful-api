@@ -3,7 +3,7 @@ from app.util.AuthUtil import *
 
 
 @app.route('/group/<string:group_id>', methods=['GET'])
-@group_read_permission_required
+@authorized_required
 def get_group_info(user, group_id):
     """
     @api {get} /group/:id Get info of group
