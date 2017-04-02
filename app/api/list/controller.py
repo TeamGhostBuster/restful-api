@@ -645,7 +645,7 @@ def partition_user_list(user, list_id):
                     'new_list': JsonUtil.serialize(result[1])}), 200
 
 
-@app.route('/user/list/<base_list_id>/article/<string:article_id>/copy/list/<target_list_id>', methods=['PUT'])
+@app.route('/user/list/<base_list_id>/article/<string:article_id>/copy/list/<target_list_id>', methods=['POST'])
 @authorized_required
 def copy_article_in_user_list(user, base_list_id, article_id, target_list_id):
     """
