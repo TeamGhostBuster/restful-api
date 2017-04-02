@@ -66,3 +66,5 @@ def share_article_to_group(user, base_list_id, article_id, group_id, target_list
         return ResponseUtil.error_response(result)
 
     app.logger.info('User {} share article {} to group {}'.format(user, article_id, group_id))
+
+    return jsonify(msg='Success')

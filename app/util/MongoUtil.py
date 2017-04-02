@@ -636,13 +636,13 @@ def share_article_to_group_list(user, base_list_id, article_id, group_id, target
     try:
         # Check ownership
         base_list = List.objects.get(id=ObjectId(base_list_id))
-        target_list = List.objects(id=ObjectId(target_list_id))
+        target_list = List.objects.get(id=ObjectId(target_list_id))
         article = Article.objects.get(id=ObjectId(article_id))
         Group.objects.get(Q(id=ObjectId(group_id)) & Q(lists=target_list))
         User.objects.get(Q(id=user.id) & Q(lists=base_list))
 
         # Add article ito the list
-        List.objects.update_one(push__lists=article)
+        List.objects(id=target_list.id).update_one(push__articles=article)
 
         # Init the vote object as well
         Vote(article=article, list=target_list).save()
